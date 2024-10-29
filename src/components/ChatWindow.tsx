@@ -39,7 +39,7 @@ export default function ChatWindow({
     <div className="flex flex-col h-[calc(100vh-4rem)] p-4 bg-gray-900">
       <div
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto space-y-4 pr-4 mb-4 custom-scrollbar"
+        className="flex-1 overflow-y-auto space-y-4 pr-4 mb-4"
       >
         <AnimatePresence>
           {currentChat.map((msg, index) => (
