@@ -5,22 +5,55 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MessageSquare, Loader2 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Implement forgot password logic here
-    console.log("Sending reset email to:", email)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
-    setIsSubmitted(true)
+
+    if (!validateEmail(email)) {
+      setErrorMessage("Please enter a valid email address.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/forgot-password`, {
+        email: email,
+      });
+      
+      const token = response.data.access_token;
+      sessionStorage.setItem("token", token);
+    
+      setIsSubmitted(true)
+      navigate("/Login");
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.msg) {
+        setErrorMessage(error.response.data.msg);
+      } else {
+        setErrorMessage("Password reset failed.");
+      }
+      console.error("There was an error resetting the password:", error);
+    } finally {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setIsLoading(false);
+    }
   }
+
+  const validateEmail = (email: string): boolean => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">
@@ -41,10 +74,10 @@ export default function ForgotPassword() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
               />
             </div>
+            {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
             <Button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -67,7 +100,7 @@ export default function ForgotPassword() {
           </div>
         )}
         <div className="text-center">
-          <a href="/Login" className="text-blue-400 hover:text-blue-300">
+          <a onClick={() => {navigate("/Login")}} className="text-blue-400 hover:text-blue-300 cursor-pointer">
             Back to login
           </a>
         </div>

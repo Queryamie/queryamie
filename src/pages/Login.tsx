@@ -6,22 +6,62 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MessageSquare, Loader2 } from "lucide-react"
+import axios from "axios"
+import qs from "qs";
 
 export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Implement login logic here
-    console.log("Logging in with:", email, password)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
-    navigate("/QueryAmi")
+
+    try {
+      if (!email || !password) {
+        setErrorMessage("Email and password are required.");
+        setIsLoading(false);
+        return;
+      }
+
+      const formData = {
+        email,
+        password
+      }
+      console.log(formData);
+  
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_API}/token`,
+        qs.stringify(formData),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+  
+      const token = response.data.access_token;
+      sessionStorage.setItem("token", token);
+  
+      navigate("/QueryAmi");
+    } catch (error: any) {
+      console.error("Error response:", error.response);
+  
+      if (error.response && error.response.data && error.response.data.detail) {
+        const errorMessages = error.response.data.detail.map((err: any) => {
+          return `${err.loc[1]}: ${err.msg}`;
+        });
+        setErrorMessage(errorMessages.join(", "));
+      } else {
+        setErrorMessage("Login failed. Please try again.");
+      }
+    } finally {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -42,7 +82,6 @@ export default function Login() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
@@ -54,15 +93,15 @@ export default function Login() {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
           <div className="flex items-center justify-between">
-            <a href="/ForgotPassword" className="text-sm text-blue-400 hover:text-blue-300">
+            <a onClick={() => {navigate("/ForgotPassword")}} className="cursor-pointer text-sm text-blue-400 hover:text-blue-300">
               Forgot your password?
             </a>
           </div>
+          {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -81,7 +120,7 @@ export default function Login() {
         <div className="text-center">
           <p className="text-gray-400">
             Don't have an account?{" "}
-            <a href="/Register" className="text-blue-400 hover:text-blue-300">
+            <a onClick={() => {navigate("/Register")}} className="cursor-pointer text-blue-400 hover:text-blue-300">
               Sign up
             </a>
           </p>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MessageSquare, Loader2 } from "lucide-react"
+import axios from 'axios'
 
 export default function Register() {
   const [username, setUsername] = useState("")
@@ -14,25 +15,68 @@ export default function Register() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    
-    // Implement registration logic here
-    if (password !== confirmPassword) {
-      alert("Passwords do not match.")
-      setIsLoading(false)
-      return
+
+    if (!username || !name || !email || !password || !confirmPassword) {
+      setErrorMessage("Please fill in all fields.");
+      setIsLoading(false);
+      return;
     }
+
+    if (!validateEmail(email)) {
+      setErrorMessage("Please enter a valid email address.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match!");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/register`, {
+        username: username,
+        full_name: name,
+        email: email,
+        password: password,
+      });
+      
+      const token = response.data.access_token;
+      sessionStorage.setItem("token", token);
     
-    console.log("Registering with:", username, name, email, password)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
-    navigate("/QueryAmi")
+      navigate("/Login");
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.msg) {
+        setErrorMessage(error.response.data.msg);
+      } else {
+        setErrorMessage("Registration failed. Please try again.");
+      }
+      console.error("There was an error registering the user:", error);
+    } finally {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setIsLoading(false);
+    }
   }
+
+  const validateEmail = (email: string): boolean => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">
@@ -52,7 +96,6 @@ export default function Register() {
               placeholder="Enter your username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              required
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
@@ -64,7 +107,6 @@ export default function Register() {
               placeholder="Enter your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
@@ -76,7 +118,6 @@ export default function Register() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
@@ -88,7 +129,6 @@ export default function Register() {
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
@@ -100,10 +140,10 @@ export default function Register() {
               placeholder="Confirm your password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              required
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
+          {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -122,7 +162,7 @@ export default function Register() {
         <div className="text-center">
           <p className="text-gray-400">
             Already have an account?{" "}
-            <a href="/Login" className="text-blue-400 hover:text-blue-300">
+            <a onClick={() => {navigate("/Login")}} className="cursor-pointer text-blue-400 hover:text-blue-300">
               Sign in
             </a>
           </p>

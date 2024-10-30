@@ -13,12 +13,7 @@ interface ChatWindowProps {
   onNewChat: () => void;
 }
 
-export default function ChatWindow({
-  currentChat,
-  onSendMessage,
-  isFileUploaded,
-  onNewChat,
-}: ChatWindowProps) {
+export default function ChatWindow({ currentChat, onSendMessage, isFileUploaded, onNewChat, }: ChatWindowProps) {
   const [message, setMessage] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
 

@@ -13,12 +13,15 @@ import {
 import Sidebar from "../components/Sidebar";
 import ChatWindow from "../components/ChatWindow";
 import { Menu, X, MessageSquare, User, Settings, LogOut, PlusCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function QueryAmi() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     const [chatHistory, setChatHistory] = useState<string[]>([]);
     const [currentChat, setCurrentChat] = useState<string[]>([]);
+    
+    const navigate = useNavigate();
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -47,6 +50,7 @@ export default function QueryAmi() {
     };
 
     const handleLogout = () => {
+        navigate("/");
         console.log("Logged out");
     };
 
