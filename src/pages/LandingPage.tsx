@@ -333,6 +333,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <nav className="flex flex-wrap gap-6">
+                <a onClick={() => {navigate("/Contact")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600  dark:hover:text-indigo-400 transition-colors">Contact Us</a>
                 <a onClick={() => {navigate("/PrivacyPolicy")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600  dark:hover:text-indigo-400 transition-colors">Privacy Policy</a>
                 <a onClick={() => {navigate("/TermsOfService")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Terms of Service</a>
               </nav>

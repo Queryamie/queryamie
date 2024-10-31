@@ -9,6 +9,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Contact from "./pages/Contact";
 
 
 
@@ -24,6 +25,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/QueryAmi" element={<QueryAmi />} />
       <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
       <Route path="/TermsOfService" element={<TermsOfService />} />
+      <Route path="/Contact" element={<Contact />} />
     </Routes>
   );
 };
