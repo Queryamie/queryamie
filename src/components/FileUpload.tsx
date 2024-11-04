@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, File, Send, X } from "lucide-react";
+import { Upload, File, Send, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FileUploadProps {
@@ -8,16 +8,15 @@ interface FileUploadProps {
   onFileUpload: (files: File[]) => void;
   handleRemoveFile: (file: File) => void;
   onSubmitFiles: () => void;
+  errorMessage: string | null,
+  isLoading: boolean,
+  isSubmitted: boolean,
 }
 
-export function FileUpload({
-  uploadedFiles,
-  onFileUpload,
-  handleRemoveFile,
-  onSubmitFiles,
-}: FileUploadProps) {
+export function FileUpload({ uploadedFiles, onFileUpload, handleRemoveFile, onSubmitFiles, errorMessage, isLoading, isSubmitted}: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -107,13 +106,28 @@ export function FileUpload({
                 </motion.li>
               ))}
             </ul>
-            <Button
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-              onClick={onSubmitFiles}
-            >
-              <Send className="h-4 w-4 mr-2" />
-              Submit Files
-            </Button>
+            {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
+            {!isSubmitted ? (
+              <Button
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+                onClick={onSubmitFiles}
+              >
+                {isLoading ? (
+                    <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting your files...
+                    </>
+                ) : (
+                    <>
+                    <Send className="mr-2 h-4 w-4"/>
+                    Submit Files
+                    </>
+                )}
+              </Button>            ) : (
+            <div className="text-center text-gray-200">
+                <p className="text-green-500">Files submitted successfully, you can start chatting now.</p>
+            </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

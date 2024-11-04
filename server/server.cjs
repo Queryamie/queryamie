@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const feedbackRoutes = require('./routes/feedbackRoutes.cjs');
+const chatRoutes = require('./routes/chatRoutes.cjs');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', feedbackRoutes);
+app.use('/api', chatRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

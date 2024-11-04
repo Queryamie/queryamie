@@ -142,7 +142,7 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
               >
-                <a onClick={() => {navigate("/QueryAmi")}}>
+                <a onClick={() => {navigate("/Login")}}>
                   <Button size="lg" className="text-lg px-8 py-6 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white">
                     Start for Free <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>

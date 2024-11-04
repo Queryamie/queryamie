@@ -48,7 +48,7 @@ export default function Register() {
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/register`, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/signup`, {
         username: username,
         full_name: name,
         email: email,
@@ -65,6 +65,7 @@ export default function Register() {
       } else {
         setErrorMessage("Registration failed. Please try again.");
       }
+      setIsLoading(false);
       console.error("There was an error registering the user:", error);
     } finally {
       await new Promise(resolve => setTimeout(resolve, 2000))

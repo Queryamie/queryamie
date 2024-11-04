@@ -1,31 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
 import Sidebar from "../components/Sidebar";
 import ChatWindow from "../components/ChatWindow";
-import { Menu, X, MessageSquare, User, Settings, LogOut, PlusCircle } from "lucide-react";
+import { Menu, X, MessageSquare, User, LogOut, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+interface Message {
+  sender: 'user' | 'QueryAmie' | 'error';
+  message: string;
+}
+
+interface ChatSession {
+    session_id: string;
+    session_name: string;
+    created_at: string;
+}
+
 
 export default function QueryAmi() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-    const [chatHistory, setChatHistory] = useState<string[]>([]);
-    const [currentChat, setCurrentChat] = useState<string[]>([]);
+    const [chatMessages, setChatMessages] = useState<Message[]>([]);
+    const [chatErrorMessage, setChatErrorMessage] = useState<Message | null>(null);
+    const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
+    const [isNewChat, setIsNewChat] = useState(true);
+    const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
+    const [chatHistoryMessages, setChatHistoryMessages] = useState<Message[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [currentChatSessionId, setCurrentChatSessionId] = useState('');
     
     const navigate = useNavigate();
-
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+    // Redirect if no token is present
+    useEffect(() => {
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            navigate("/");
+        }
+    }, [navigate]);
+
     const handleFileUpload = (newFiles: File[]) => {
+        setIsSubmitted(false); //clear message and show the submit button again.
+        setIsSubmitSuccessful(false)    //user must submit before they can continue to chat
         setUploadedFiles((prevFiles) => {
             const existingFileNames = new Set(prevFiles.map((file) => file.name));
             const filteredNewFiles = newFiles.filter((file) => !existingFileNames.has(file.name));
@@ -34,22 +57,143 @@ export default function QueryAmi() {
     };
 
     const handleRemoveFile = (fileToRemove: File) => {
+        setIsSubmitted(false); //clear message and show the submit button again.
         setUploadedFiles((prevFiles) => prevFiles.filter((file) => file !== fileToRemove));
     };
 
+    const handleSubmitFiles = async () => {
+        setIsLoading(true);
 
-    const handleSubmitFiles = () => {
         if (uploadedFiles.length > 0) {
-            console.log("Submitting files:", uploadedFiles);
+            const formData = new FormData();
+            uploadedFiles.forEach((file) => formData.append("files", file));
+    
+            const token = sessionStorage.getItem("token");
+            try {
+                const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/upload_documents`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}` // Add the authorization header
+                    }
+                });
+                console.log("Files uploaded successfully:", response.data.msg);
+                setIsSubmitSuccessful(true);
+                setIsLoading(false);
+                setIsSubmitted(true);
+                // setUploadedFiles([]);
+            } catch (error) {
+                console.error("Upload failed:", error);
+                setErrorMessage("Error Uploading File(s).");
+                setIsLoading(false);
+            }
+        }
+        else{
+            setErrorMessage("Please upload a new file to submit");
+        }
+    };
+            
+
+    const handleNewChat = () => {
+        setCurrentChatSessionId('');
+        setUploadedFiles([]);
+        setChatMessages([]);
+        setIsSubmitSuccessful(false);
+        setIsSubmitted(false);
+        setChatErrorMessage(null);
+        setIsNewChat(true);
+    };
+
+
+    useEffect(() => {
+        fetchChatHistory();
+        const interval = setInterval(fetchChatHistory, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+
+    // This is for fetching all the chat history
+    const fetchChatHistory = async () => {
+        try {
+            const response = await axios.get(
+                `/api/get-chat-sessions`,
+                {
+                    params: {
+                        user_id: sessionStorage.getItem("userId"),
+                    }
+                }
+            );
+            const data = response.data;
+            if (data.error) {
+                console.error("Error", data.error);
+            } else {
+                setChatHistory(data.chat_sessions);
+            }
+        } catch (error) {
+            console.error("Error:", error);
         }
     };
 
-    const handleNewChat = () => {
-        setUploadedFiles([]);
-        setCurrentChat([]);
+    // Fetch messages for the selected session
+    const handleFetchSessionMessages = async (sessionId:string) => {
+        if(sessionId) {
+            try {
+                const response = await axios.post(`/api/get-session-messages/${sessionId}`, {
+                    user_id: sessionStorage.getItem("userId")
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const data = response.data;
+                if (data.error) {
+                    console.log(data.error);
+                } else {
+                    setChatHistoryMessages(data.messages);
+                    setIsSidebarOpen(false) //close side bar
+                    if(sessionId !== currentChatSessionId){
+                        setCurrentChatSessionId(sessionId);
+                        setIsSubmitSuccessful(false)    //user must submit before they can continue to chat
+                        setIsSubmitted(false); //clear message and show the submit button again.
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        else {
+            console.error("session id needed to fetch messages");
+        }
+    }
+
+
+
+    const handleDeleteChatHistory = async (sessionId: string) => {
+        if(sessionId) {
+            try {
+                const userId = sessionStorage.getItem("userId");
+                const response = await axios.delete(`/api/delete-chat-session/${sessionId}`, {
+                    params: { user_id: userId }
+                });
+        
+                const data = response.data;
+                if (data.error) {
+                    console.error(data.error);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+        else {
+            console.error("Session id required for deletion");
+        }
     };
 
+
+
+
     const handleLogout = () => {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("userId");
         navigate("/");
         console.log("Logged out");
     };
@@ -100,7 +244,7 @@ export default function QueryAmi() {
                     <DropdownMenuContent className="w-56 bg-gray-800 border-gray-700 text-gray-100">
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                            <DropdownMenuItem className="focus:bg-gray-700">
+                            {/* <DropdownMenuItem className="focus:bg-gray-700">
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Profile</span>
                             </DropdownMenuItem>
@@ -108,7 +252,7 @@ export default function QueryAmi() {
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
                             </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator /> */}
                         <DropdownMenuItem className="focus:bg-gray-700" onClick={handleLogout}>
                             <LogOut className="mr-2 h-4 w-4" />
                             <span>Log out</span>
@@ -126,15 +270,30 @@ export default function QueryAmi() {
                     handleRemoveFile={handleRemoveFile}
                     onSubmitFiles={handleSubmitFiles}
                     chatHistory={chatHistory}
+                    onSessionClick={handleFetchSessionMessages}
+                    onDeleteHistoryClick={handleDeleteChatHistory}
+                    errorMessage={errorMessage}
+                    isLoading={isLoading}
+                    isSubmitted={isSubmitted}
                 />
                 <main className="flex-1 overflow-hidden">
                     <ChatWindow
-                        currentChat={currentChat}
-                        onSendMessage={(message) => setCurrentChat([...currentChat, message])}
-                        isFileUploaded={uploadedFiles.length > 0}
+                        isSubmitSuccessful={isSubmitSuccessful}
                         onNewChat={handleNewChat}
+                        chatMessages={chatMessages}
+                        setChatMessages={setChatMessages}
+                        chatErrorMessage={chatErrorMessage}
+                        setChatErrorMessage={setChatErrorMessage}
+                        isNewChat={isNewChat}
+                        setIsNewChat={setIsNewChat}
+                        chatHistoryMessages={chatHistoryMessages}
+                        currentChatSessionId={currentChatSessionId}
+                        setCurrentChatSessionId={setCurrentChatSessionId}
                     />
-                    <Button onClick={handleSubmitFiles}>Submit Files</Button>
+                    <Button
+                    onClick={handleSubmitFiles}
+                    >Submit Files
+                    </Button>
                 </main>
             </div>
         </div>

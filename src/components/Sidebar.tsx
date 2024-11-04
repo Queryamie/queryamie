@@ -3,25 +3,29 @@ import { ChatHistory } from './ChatHistory'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 
-interface SidebarProps {
-  isOpen: boolean
-  onClose: () => void
-  uploadedFiles: File[]
-  onFileUpload: (files: File[]) => void
-  handleRemoveFile: (file: File) => void;
-  onSubmitFiles: () => void
-  chatHistory: string[]
+interface ChatSession {
+  session_id: string;
+  session_name: string;
+  created_at: string;
 }
 
-export default function Sidebar({
-  isOpen,
-  onClose,
-  uploadedFiles,
-  onFileUpload,
-  handleRemoveFile,
-  onSubmitFiles,
-  chatHistory,
-}: SidebarProps) {
+
+interface SidebarProps {
+  isOpen: boolean,
+  onClose: () => void,
+  uploadedFiles: File[],
+  onFileUpload: (files: File[]) => void,
+  handleRemoveFile: (file: File) => void,
+  onSubmitFiles: () => void,
+  chatHistory: ChatSession[];
+  onSessionClick: (sessionId: string) => void;
+  onDeleteHistoryClick: (sessionId: string) => void;
+  errorMessage: string | null,
+  isLoading: boolean,
+  isSubmitted: boolean,
+}
+
+export default function Sidebar({ isOpen, onClose, uploadedFiles, onFileUpload, handleRemoveFile, onSubmitFiles, chatHistory, onSessionClick, onDeleteHistoryClick, errorMessage, isLoading, isSubmitted}: SidebarProps) {
   return (
     <div
       className={`fixed inset-y-0 left-0 z-50 w-72 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
@@ -44,8 +48,15 @@ export default function Sidebar({
           onFileUpload={onFileUpload}
           handleRemoveFile={handleRemoveFile}
           onSubmitFiles={onSubmitFiles}
+          errorMessage={errorMessage}
+          isLoading={isLoading}
+          isSubmitted={isSubmitted}
         />
-        <ChatHistory chatHistory={chatHistory} />
+        <ChatHistory
+          chatHistory={chatHistory}
+          onSessionClick={onSessionClick}
+          onDeleteHistoryClick={onDeleteHistoryClick}
+        />
       </div>
     </div>
   )

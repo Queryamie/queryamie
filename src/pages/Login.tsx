@@ -10,7 +10,7 @@ import axios from "axios"
 import qs from "qs";
 
 export default function Login() {
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -21,20 +21,20 @@ export default function Login() {
     setIsLoading(true)
 
     try {
-      if (!email || !password) {
-        setErrorMessage("Email and password are required.");
+      if (!username || !password) {
+        setErrorMessage("Username and password are required.");
         setIsLoading(false);
         return;
       }
 
       const formData = {
-        email,
+        username,
         password
       }
       console.log(formData);
   
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_API}/token`,
+        `${import.meta.env.VITE_BACKEND_API}/login`,
         qs.stringify(formData),
         {
           headers: {
@@ -42,9 +42,13 @@ export default function Login() {
           },
         }
       );
-  
+      // set access token
       const token = response.data.access_token;
       sessionStorage.setItem("token", token);
+
+      // set user id
+      const userId = response.data.user_id;
+      sessionStorage.setItem("userId", userId);
   
       navigate("/QueryAmi");
     } catch (error: any) {
@@ -57,6 +61,7 @@ export default function Login() {
         setErrorMessage(errorMessages.join(", "));
       } else {
         setErrorMessage("Login failed. Please try again.");
+        setIsLoading(false);
       }
     } finally {
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -75,13 +80,13 @@ export default function Login() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="email" className="text-gray-200">Email address</Label>
+            <Label htmlFor="email" className="text-gray-200">Username</Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="text"
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
             />
           </div>
