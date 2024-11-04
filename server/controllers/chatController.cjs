@@ -107,7 +107,6 @@ exports.getSessionMessages = async (req, res) => {
 };
 
 exports.deleteChatSession = async (req, res) => {
-    console.log("delete controller in action");
     try {
         const { session_id } = req.params;
         const user_id = req.query.user_id;

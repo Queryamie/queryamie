@@ -77,7 +77,7 @@ function startNewChat(firstMessage: string, response: string) {
   const user_id = sessionStorage.getItem("userId");
 
   if (user_id) {
-    axios.post('/api/start-chat', {
+    axios.post('/api/chat/startChat', {
         user_id: user_id,
         message: firstMessage
       })
@@ -100,7 +100,7 @@ function continueChat(message: string, sender: string) {
   const user_id = sessionStorage.getItem("userId");
   if (currentChatSessionId) {
     // Send message to backend
-    axios.post(`/api/add-message/${currentChatSessionId}`, {
+    axios.post(`/api/chat/addMessage/${currentChatSessionId}`, {
       user_id: user_id,
       message: message,
       sender: sender

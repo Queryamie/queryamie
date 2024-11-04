@@ -115,7 +115,7 @@ export default function QueryAmi() {
     const fetchChatHistory = async () => {
         try {
             const response = await axios.get(
-                `/api/get-chat-sessions`,
+                `/api/chat/getChatSessions`,
                 {
                     params: {
                         user_id: sessionStorage.getItem("userId"),
@@ -137,7 +137,7 @@ export default function QueryAmi() {
     const handleFetchSessionMessages = async (sessionId:string) => {
         if(sessionId) {
             try {
-                const response = await axios.post(`/api/get-session-messages/${sessionId}`, {
+                const response = await axios.post(`/api/chat/getSessionMessages/${sessionId}`, {
                     user_id: sessionStorage.getItem("userId")
                 }, {
                     headers: {
@@ -171,7 +171,7 @@ export default function QueryAmi() {
         if(sessionId) {
             try {
                 const userId = sessionStorage.getItem("userId");
-                const response = await axios.delete(`/api/delete-chat-session/${sessionId}`, {
+                const response = await axios.delete(`/api/chat/deleteChatSession/${sessionId}`, {
                     params: { user_id: userId }
                 });
         

@@ -36,7 +36,7 @@ export default function Contact() {
     }
 
     try {
-        const response = await axios.post(`/api/feedback`, {
+        const response = await axios.post(`/api/feedback/feedback`, {
             name: name,
             email: email,
             message: message,
