@@ -1,7 +1,10 @@
 import ChatSession from "../models/ChatSession.cjs";
+import connectDB from '../config/db.cjs';
 // import mongoose from "mongoose";
 
 export default async function handler(req, res) {
+    await connectDB();
+
     if (req.method === "POST") {
         const { user_id, message } = req.body;
 

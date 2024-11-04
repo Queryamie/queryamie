@@ -1,7 +1,10 @@
-import Feedback from "../models/Feedback.cjs"; // Adjust path if necessary
+import Feedback from "../models/Feedback.cjs"; 
+import connectDB from '../config/db.cjs';
 import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
+    await connectDB();
+
     if (req.method === "POST") {
         const { name, email, message } = req.body;
 

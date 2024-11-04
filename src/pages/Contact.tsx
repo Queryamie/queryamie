@@ -21,6 +21,7 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMessage('');
     setIsLoading(true);
 
     if (!name || !email || !message){
@@ -36,6 +37,8 @@ export default function Contact() {
     }
 
     try {
+      console.log("Submitting feedback:", { name, email, message });
+
         const response = await axios.post(`/api/feedback/feedback`, {
             name: name,
             email: email,

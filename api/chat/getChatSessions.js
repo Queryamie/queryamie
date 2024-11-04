@@ -1,6 +1,9 @@
 import ChatSession from "../models/ChatSession.cjs";
+import connectDB from '../config/db.cjs';
 
 export default async function handler(req, res) {
+    await connectDB();
+
     if (req.method === "GET") {
         const { user_id } = req.query;
 
