@@ -4,7 +4,6 @@ import connectDB from '../config/db.cjs';
 export default async function handler(req, res) {
     await connectDB();
 
-
     if (req.method === "POST") {
         const { session_id } = req.query;
         const { user_id } = req.body;

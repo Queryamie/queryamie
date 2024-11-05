@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
     if (req.method === "DELETE") {
         const { session_id } = req.query;
-        const { user_id } = req.body;
+        const { user_id } = req.query;
 
         if (!user_id) {
         return res.status(401).json({ error: "User not authenticated" });
