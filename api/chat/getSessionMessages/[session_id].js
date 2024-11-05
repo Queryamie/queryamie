@@ -1,12 +1,9 @@
-import ChatSession from "../../../models/ChatSession.cjs";
-import connectDB from '../../../config/db.cjs';
+import ChatSession from "../../models/ChatSession.cjs";
+import connectDB from '../../config/db.cjs';
 
 export default async function handler(req, res) {
     await connectDB();
 
-    console.log("Received request:", req.method);
-    console.log("Session ID from query:", req.query.session_id);
-    console.log("Request body:", req.body);
 
     if (req.method === "POST") {
         const { session_id } = req.query;
