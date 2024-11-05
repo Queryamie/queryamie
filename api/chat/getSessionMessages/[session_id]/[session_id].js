@@ -1,5 +1,5 @@
-import ChatSession from "../../models/ChatSession.cjs";
-import connectDB from '../../config/db.cjs';
+import ChatSession from "../../../models/ChatSession.cjs";
+import connectDB from '../../../config/db.cjs';
 
 export default async function handler(req, res) {
     await connectDB();
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     console.log("Session ID from query:", req.query.session_id);
     console.log("Request body:", req.body);
 
-    // if (req.method === "POST") {
+    if (req.method === "POST") {
         const { session_id } = req.query;
         const { user_id } = req.body;
 
@@ -34,8 +34,8 @@ export default async function handler(req, res) {
         console.error("Error fetching session messages:", error);
         res.status(500).json({ error: "Failed to retrieve session messages" });
         }
-    // } else {
-    //     res.setHeader("Allow", ["POST"]);
-    //     res.status(405).end(`Method ${req.method} Not Allowed`);
-    // }
+    } else {
+        res.setHeader("Allow", ["POST"]);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
 }
