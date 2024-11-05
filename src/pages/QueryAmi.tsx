@@ -172,7 +172,7 @@ export default function QueryAmi() {
         if(sessionId) {
             try {
                 const userId = sessionStorage.getItem("userId");
-                const response = await axios.delete(`/api/chat/deleteChatSession/${sessionId}`, {
+                const response = await axios.delete(`/api/chat/deleteChatSession?session_id=${sessionId}`, {
                     params: { user_id: userId }
                 });
         

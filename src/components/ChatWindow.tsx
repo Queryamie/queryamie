@@ -100,7 +100,7 @@ function continueChat(message: string, sender: string) {
   const user_id = sessionStorage.getItem("userId");
   if (currentChatSessionId) {
     // Send message to backend
-    axios.post(`/api/chat/addMessage/${currentChatSessionId}`, {
+    axios.post(`/api/chat/addMessage?session_id=${currentChatSessionId}`, {
       user_id: user_id,
       message: message,
       sender: sender
