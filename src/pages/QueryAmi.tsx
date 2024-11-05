@@ -138,7 +138,7 @@ export default function QueryAmi() {
     const handleFetchSessionMessages = async (sessionId:string) => {
         if(sessionId) {
             try {
-                const response = await axios.post(`/api/chat/getSessionMessages/session_id=${sessionId}`, {
+                const response = await axios.post(`/api/chat/getSessionMessages?session_id=${sessionId}`, {
                     user_id: sessionStorage.getItem("userId")
                 }, {
                     headers: {
