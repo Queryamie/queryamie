@@ -62,6 +62,7 @@ export default function QueryAmi() {
     };
 
     const handleSubmitFiles = async () => {
+        setErrorMessage('');
         setIsLoading(true);
 
         if (uploadedFiles.length > 0) {

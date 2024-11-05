@@ -21,6 +21,7 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMessage('');
     setIsLoading(true)
 
     if (!username || !name || !email || !password || !confirmPassword) {
