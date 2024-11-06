@@ -357,7 +357,7 @@ export default function LandingPage() {
                   <Twitter className="h-6 w-6" />
                   <span className="sr-only">Twitter</span>
                 </a>
-                <a href="https://linkedin.com/company/queryamie" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                <a href="https://www.linkedin.com/company/queryamie" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   <Linkedin className="h-6 w-6" />
                   <span className="sr-only">LinkedIn</span>
                 </a>
