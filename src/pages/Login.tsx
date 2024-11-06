@@ -53,17 +53,8 @@ export default function Login() {
   
       navigate("/QueryAmi");
     } catch (error: any) {
-      console.error("Error response:", error.response);
-  
-      if (error.response && error.response.data && error.response.data.detail) {
-        const errorMessages = error.response.data.detail.map((err: any) => {
-          return `${err.loc[1]}: ${err.msg}`;
-        });
-        setErrorMessage(errorMessages.join(", "));
-      } else {
-        setErrorMessage("Login failed. Please try again.");
-        setIsLoading(false);
-      }
+      setErrorMessage(error.response.data.detail);
+      setIsLoading(false);
     } finally {
       await new Promise(resolve => setTimeout(resolve, 2000))
       setIsLoading(false);

@@ -280,6 +280,8 @@ export default function QueryAmi() {
                 <main className="flex-1 overflow-hidden">
                     <ChatWindow
                         isSubmitSuccessful={isSubmitSuccessful}
+                        isSidebarOpen={isSidebarOpen}
+                        toggleSidebar={toggleSidebar}
                         onNewChat={handleNewChat}
                         chatMessages={chatMessages}
                         setChatMessages={setChatMessages}

@@ -3,12 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, PlusCircle, Bot, User } from "lucide-react";
+import { Send, PlusCircle, Bot, User, Paperclip, Loader } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 interface ChatWindowProps {
   isSubmitSuccessful: boolean;
+  isSidebarOpen: boolean,
+  toggleSidebar: () => void;
   onNewChat: () => void;
   chatMessages: Message[];
   setChatMessages: React.Dispatch<React.SetStateAction<Message[]>>;
@@ -27,12 +29,25 @@ interface Message {
 }
 
 
-export default function ChatWindow({ isSubmitSuccessful, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
+export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
   const [message, setMessage] = useState("");
   const [firstResponse, setFirstResponse] = useState("");
   const [isFirstResponse, setIsFirstResponse] = useState(true);
   const [isContinuousChat, setIsContinuousChat] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
+  const [isLoading, setIsLoading] = useState(false)
+  const hasMessages = chatMessages.length > 0 || chatErrorMessage;
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Effect to listen for window resize and update isSmallScreen
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -132,6 +147,7 @@ function continueChat(message: string, sender: string) {
         
         setChatMessages((prevMessages) => [...prevMessages, { sender: 'user', message: trimmedMessage }]);
         setMessage("");
+        setIsLoading(true);
 
         const token = sessionStorage.getItem("token");
 
@@ -160,11 +176,13 @@ function continueChat(message: string, sender: string) {
           }, 2000);
         }
       
+        setIsLoading(false);
         setChatErrorMessage(null);
         setChatMessages((prevMessages) => [...prevMessages, { sender: 'QueryAmie', message: botResponse }]);
 
       } catch (error) {
         console.error("Error sending message:", error);
+        setIsLoading(false);
         setChatErrorMessage({ sender: 'error', message: "An unexpected error occurred. Please try again." });
       }
     }
@@ -175,6 +193,24 @@ function continueChat(message: string, sender: string) {
     <div className="flex flex-col h-[calc(100vh-4rem)] p-4 bg-gray-900">
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto space-y-4 pr-4 mb-4">
         <AnimatePresence>
+          {!hasMessages && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-start space-x-2 justify-start"
+            >
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-5 h-5 text-gray-300" />
+              </div>
+              <div className="p-3 rounded-lg max-w-[70%] bg-gray-800 text-gray-200 break-words space-y-2">
+                <p>Welcome to <strong className="text-blue-400">QueryAmie</strong>! How can I assist you today?</p>
+                <p>Please upload a document to get started.</p>
+              </div>
+            </motion.div>
+          )}
+
           {chatMessages.map((msg, index) => (
             <motion.div
               key={index}
@@ -182,18 +218,17 @@ function continueChat(message: string, sender: string) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={`flex items-start space-x-2 ${msg.sender === 'user' ? "justify-end" : "justify-start"}`}
+              className={`flex items-start space-x-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.sender === 'QueryAmie' && (
                 <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
                   <Bot className="w-5 h-5 text-gray-300" />
                 </div>
               )}
-              <div 
-                dangerouslySetInnerHTML={{ __html: msg.message }} 
-                className={`p-3 rounded-lg max-w-[70%] break-words ${msg.sender === 'user' ? "bg-gray-700 text-gray-100" : "bg-gray-800 text-gray-200"} overflow-x-auto`}
-              >
-              </div>
+              <div
+                dangerouslySetInnerHTML={{ __html: msg.message }}
+                className={`p-3 rounded-lg max-w-[70%] break-words ${msg.sender === 'user' ? 'bg-gray-700 text-gray-100' : 'bg-gray-800 text-gray-200'} overflow-x-auto`}
+              ></div>
               {msg.sender === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-gray-300" />
@@ -201,6 +236,24 @@ function continueChat(message: string, sender: string) {
               )}
             </motion.div>
           ))}
+
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-start space-x-2 justify-start"
+            >
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-5 h-5 text-gray-300" />
+              </div>
+              <div className="p-3 rounded-lg max-w-[70%] bg-gray-800 text-gray-200 break-words">
+                <Loader className="w-5 h-5 animate-spin" />
+              </div>
+            </motion.div>
+          )}
+
           {chatErrorMessage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -212,7 +265,10 @@ function continueChat(message: string, sender: string) {
               <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
                 <Bot className="w-5 h-5 text-gray-300" />
               </div>
-              <div dangerouslySetInnerHTML={{ __html: chatErrorMessage.message }} className="p-3 rounded-lg max-w-[70%] break-words bg-gray-800 text-red-500"></div>
+              <div
+                dangerouslySetInnerHTML={{ __html: chatErrorMessage.message }}
+                className="p-3 rounded-lg max-w-[70%] break-words bg-gray-800 text-red-500"
+              ></div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -232,8 +288,23 @@ function continueChat(message: string, sender: string) {
           className="bg-gray-700 hover:bg-gray-600 text-gray-100">
           <Send className="h-4 w-4" />
         </Button>
-        <Button variant="outline" onClick={onNewChat} className="border-gray-700 text-gray-800 hover:bg-gray-800 hover:text-gray-100">
-          <PlusCircle className="h-4 w-4" />
+        <Button
+          variant="outline"
+          onClick={
+            isSmallScreen
+              ? isSidebarOpen
+                ? onNewChat // Action when sidebar is open on a small screen
+                : toggleSidebar // Action when sidebar is closed on a small screen
+              : onNewChat // Default action for larger screens
+          }
+          className="border-gray-700 text-gray-800 hover:bg-gray-800 hover:text-gray-100"
+        >
+          {isSmallScreen
+            ? isSidebarOpen 
+              ? <PlusCircle className="h-4 w-4" /> 
+              : <Paperclip className="h-4 w-4" />
+            : <PlusCircle className="h-4 w-4" />
+          }
         </Button>
       </div>
     </div>

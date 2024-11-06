@@ -106,28 +106,32 @@ export default function LandingPage() {
         </header>
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-20 sm:py-5">
+        <section className="relative overflow-hidden py-10 sm:py-1">
           <div className="container mx-auto px-4 relative z-10 flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 mb-12 lg:mb-0">
               <motion.div
-                className="text-5xl sm:text-6xl md:text-7xl mb-8 font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400"
+                className="mb-8"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                {mounted && (
-                  <ReactTyped
-                    strings={[
-                      "Chat with your documents",
-                      "Get summaries instantly",
-                      "Extract key insights",
-                      "Analyze multiple files at once"
-                    ]}
-                    typeSpeed={40}
-                    backSpeed={50}
-                    loop
-                  />
-                )}
+                <div className="h-[120px] sm:h-[144px] md:h-[168px] flex items-center">
+                  <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">
+                    {mounted && (
+                      <ReactTyped
+                        strings={[
+                          "Chat with your documents",
+                          "Get summaries instantly",
+                          "Extract key insights",
+                          "Analyze multiple files at once"
+                        ]}
+                        typeSpeed={40}
+                        backSpeed={50}
+                        loop
+                      />
+                    )}
+                  </div>
+                </div>
               </motion.div>
               <motion.p 
                 className="text-xl sm:text-2xl mb-12 text-gray-700 dark:text-gray-300 max-w-2xl"
@@ -142,11 +146,13 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
               >
-                <a onClick={() => {navigate("/Login")}}>
-                  <Button size="lg" className="text-lg px-8 py-6 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white">
-                    Start for Free <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </a>
+                <Button 
+                  size="lg" 
+                  className="text-lg px-8 py-6 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white"
+                  onClick={() => navigate("/Login")}
+                >
+                  Start for Free <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               </motion.div>
             </div>
             <div className="lg:w-1/2 h-[400px] lg:h-[600px] flex items-center justify-center">
