@@ -349,7 +349,7 @@ export default function LandingPage() {
                 © {new Date().getFullYear()} QueryAmie. All rights reserved.
               </div>
               <div className="flex space-x-4 mt-4 md:mt-0">
-                <a href="mailto:contact@queryamie.com" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                <a href="mailto:queryamiee@gmail.com" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   <Mail className="h-6 w-6" />
                   <span className="sr-only">Email</span>
                 </a>
