@@ -70,12 +70,7 @@ export default function ResetPassword() {
       setIsLoading(false)
       setIsSubmitted(true)
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.msg) {
-        setErrorMessage(error.response.data.msg)
-      } else {
-        setErrorMessage("Password reset failed.")
-      }
-      console.error("There was an error resetting the password:", error)
+      setErrorMessage(error.response.data.detail)
       setIsLoading(false)
     }
   }
@@ -97,6 +92,7 @@ export default function ResetPassword() {
           </div>
           <h2 className="text-3xl font-bold text-white">Reset Password</h2>
         </div>
+              {!isSubmitted ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="password" className="text-gray-200">New Password</Label>
@@ -147,8 +143,6 @@ export default function ResetPassword() {
             </div>
           </div>
           {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
-          {!isSubmitted ? (
-
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -163,6 +157,7 @@ export default function ResetPassword() {
               "Reset Password"
             )}
           </Button>
+        </form>
           ) : (
             <div className="text-center text-gray-200">
               <p>Password Reset Successful</p>
@@ -173,7 +168,6 @@ export default function ResetPassword() {
               </div>
             </div>
           )}
-        </form>
       </div>
     </div>
   )

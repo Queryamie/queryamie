@@ -35,12 +35,8 @@ export default function ForgotPassword() {
       console.log(response.data);
       setIsSubmitted(true)
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.msg) {
-        setErrorMessage(error.response.data.msg);
-      } else {
-        setErrorMessage("Password reset failed.");
-      }
-      console.error("There was an error resetting the password:", error);
+      setErrorMessage(error.response.data.detail)
+      setIsLoading(false)
     } finally {
       await new Promise(resolve => setTimeout(resolve, 2000))
       setIsLoading(false);
