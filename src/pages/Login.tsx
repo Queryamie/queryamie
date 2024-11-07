@@ -33,7 +33,6 @@ export default function Login() {
         username,
         password
       }
-      console.log(formData)
   
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_API}/login`,
