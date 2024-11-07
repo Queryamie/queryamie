@@ -12,6 +12,7 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
@@ -33,30 +34,39 @@ export default function ResetPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage("")
-
+  
     if (password.length < 8) {
       setErrorMessage("Password must be at least 8 characters long.")
       return
     }
-
+  
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match")
       return
     }
-
+  
     if (!token) {
       setErrorMessage("No token found. Please check your reset link.")
       return
     }
-
+  
     try {
       setIsLoading(true)
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_API}/reset-password?token=${encodeURIComponent(token)}&new_password=${encodeURIComponent(password)}`
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/reset-password`, 
+        {
+          token: token, 
+          new_password: password
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
       )
+  
       console.log(response.data)
       setIsLoading(false)
-      navigate("/Login")
+      setIsSubmitted(true)
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.msg) {
         setErrorMessage(error.response.data.msg)
@@ -67,7 +77,7 @@ export default function ResetPassword() {
       setIsLoading(false)
     }
   }
-
+  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
   }
@@ -135,6 +145,8 @@ export default function ResetPassword() {
             </div>
           </div>
           {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
+          {!isSubmitted ? (
+
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -149,6 +161,16 @@ export default function ResetPassword() {
               "Reset Password"
             )}
           </Button>
+          ) : (
+            <div className="text-center text-gray-200">
+              <p>Password Reset Successful</p>
+              <div className="text-center">
+                <a onClick={() => {navigate("/Login")}} className="text-blue-400 hover:text-blue-300 cursor-pointer">
+                  Back to login
+                </a>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>
