@@ -1,53 +1,79 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { MessageSquare, Loader2 } from "lucide-react"
+import { MessageSquare, Loader2, Eye, EyeOff } from "lucide-react"
 import axios from "axios"
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Extract token from URL on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search)
+    const tokenFromUrl = urlParams.get("token")
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl)
+    } else {
+      setErrorMessage("Invalid or expired link.")
+    }
+  }, [location])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrorMessage('');
+    setErrorMessage("")
 
-    if (password.length < 8){
-      setErrorMessage("Password must be at least 8 characters long.");
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long.")
+      return
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match");
+      setErrorMessage("Passwords do not match")
       return
     }
-    
+
+    if (!token) {
+      setErrorMessage("No token found. Please check your reset link.")
+      return
+    }
+
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/reset-password`, {
-        password: password,
-      });
-      
-      const token = response.data.access_token;
-      sessionStorage.setItem("token", token);
-    
-      navigate("/Login");
+      setIsLoading(true)
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_API}/reset-password?token=${encodeURIComponent(token)}&new_password=${encodeURIComponent(password)}`
+      )
+      console.log(response.data)
+      setIsLoading(false)
+      navigate("/Login")
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.msg) {
-        setErrorMessage(error.response.data.msg);
+        setErrorMessage(error.response.data.msg)
       } else {
-        setErrorMessage("Password reset failed.");
+        setErrorMessage("Password reset failed.")
       }
-      console.error("There was an error resetting the password:", error);
-    } finally {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setIsLoading(false);
+      console.error("There was an error resetting the password:", error)
+      setIsLoading(false)
     }
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword)
   }
 
   return (
@@ -62,25 +88,51 @@ export default function ResetPassword() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="password" className="text-gray-200">New Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter new password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter new password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-gray-700 text-white border-gray-600 focus:border-blue-500 pr-10"
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
           <div>
             <Label htmlFor="confirmPassword" className="text-gray-200">Confirm New Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="bg-gray-700 text-white border-gray-600 focus:border-blue-500 pr-10"
+              />
+              <button
+                type="button"
+                onClick={toggleConfirmPasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
           {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
           <Button

@@ -1,38 +1,39 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { MessageSquare, Loader2 } from "lucide-react"
+import { MessageSquare, Loader2, Eye, EyeOff } from "lucide-react"
 import axios from "axios"
-import qs from "qs";
+import qs from "qs"
 
 export default function Login() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrorMessage('');
+    setErrorMessage('')
     setIsLoading(true)
 
     try {
       if (!username || !password) {
-        setErrorMessage("Username and password are required.");
-        setIsLoading(false);
-        return;
+        setErrorMessage("Username and password are required.")
+        setIsLoading(false)
+        return
       }
 
       const formData = {
         username,
         password
       }
-      console.log(formData);
+      console.log(formData)
   
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_API}/login`,
@@ -42,23 +43,27 @@ export default function Login() {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
         }
-      );
+      )
       // set access token
-      const token = response.data.access_token;
-      sessionStorage.setItem("token", token);
+      const token = response.data.access_token
+      sessionStorage.setItem("token", token)
 
       // set user id
-      const userId = response.data.user_id;
-      sessionStorage.setItem("userId", userId);
+      const userId = response.data.user_id
+      sessionStorage.setItem("userId", userId)
   
-      navigate("/QueryAmi");
+      navigate("/QueryAmi")
     } catch (error: any) {
-      setErrorMessage(error.response.data.detail);
-      setIsLoading(false);
+      setErrorMessage(error.response.data.detail)
+      setIsLoading(false)
     } finally {
       await new Promise(resolve => setTimeout(resolve, 2000))
-      setIsLoading(false);
+      setIsLoading(false)
     }
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -72,9 +77,9 @@ export default function Login() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="email" className="text-gray-200">Username</Label>
+            <Label htmlFor="username" className="text-gray-200">Username</Label>
             <Input
-              id="text"
+              id="username"
               type="text"
               placeholder="Enter your username"
               value={username}
@@ -84,14 +89,27 @@ export default function Login() {
           </div>
           <div>
             <Label htmlFor="password" className="text-gray-200">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-gray-700 text-white border-gray-600 focus:border-blue-500"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-gray-700 text-white border-gray-600 focus:border-blue-500 pr-10"
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <a onClick={() => {navigate("/ForgotPassword")}} className="cursor-pointer text-sm text-blue-400 hover:text-blue-300">

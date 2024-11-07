@@ -28,15 +28,12 @@ export default function ForgotPassword() {
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/forgot-password`, {
-        email: email,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_API}/forgot-password?email=${encodeURIComponent(email)}`
+      );
       
-      const token = response.data.access_token;
-      sessionStorage.setItem("token", token);
-    
+      console.log(response.data);
       setIsSubmitted(true)
-      navigate("/Login");
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.msg) {
         setErrorMessage(error.response.data.msg);
