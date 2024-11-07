@@ -65,6 +65,8 @@ export default function ResetPassword() {
       )
   
       console.log(response.data)
+      setPassword('')
+      setConfirmPassword('')
       setIsLoading(false)
       setIsSubmitted(true)
     } catch (error: any) {
