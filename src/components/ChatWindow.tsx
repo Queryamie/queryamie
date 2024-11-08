@@ -57,11 +57,11 @@ export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSi
 
 
   useEffect(() => {
-    if (currentChatSessionId && isNewChat && isFirstResponse) {
+    if (currentChatSessionId && isNewChat && isFirstResponse && firstResponse.trim() !== "") {
       continueChat(firstResponse, 'QueryAmie');
     }
   }, [currentChatSessionId]);
-  
+    
 
 
   // Function to add messages from chat history to current chat
@@ -169,7 +169,7 @@ function continueChat(message: string, sender: string) {
         }
 
         // call function to be saving messages of user and queryAmie
-        if (botResponse && botResponse.trim() && isContinuousChat) {
+        if (trimmedMessage && botResponse && botResponse.trim() !== "" && isContinuousChat) {
           continueChat(trimmedMessage, 'user');
           setTimeout(() => {
             continueChat(botResponse, 'QueryAmie');
