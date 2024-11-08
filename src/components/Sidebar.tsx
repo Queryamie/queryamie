@@ -23,9 +23,10 @@ interface SidebarProps {
   errorMessage: string | null,
   isLoading: boolean,
   isSubmitted: boolean,
+  currentChatSessionId: string;
 }
 
-export default function Sidebar({ isOpen, onClose, uploadedFiles, onFileUpload, handleRemoveFile, onSubmitFiles, chatHistory, onSessionClick, onDeleteHistoryClick, errorMessage, isLoading, isSubmitted}: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, uploadedFiles, onFileUpload, handleRemoveFile, onSubmitFiles, chatHistory, onSessionClick, onDeleteHistoryClick, errorMessage, isLoading, isSubmitted, currentChatSessionId}: SidebarProps) {
   return (
     <div
       className={`fixed inset-y-0 left-0 z-50 w-72 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
@@ -56,6 +57,7 @@ export default function Sidebar({ isOpen, onClose, uploadedFiles, onFileUpload, 
           chatHistory={chatHistory}
           onSessionClick={onSessionClick}
           onDeleteHistoryClick={onDeleteHistoryClick}
+          currentChatSessionId={currentChatSessionId}
         />
       </div>
     </div>

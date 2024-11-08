@@ -12,9 +12,10 @@ interface ChatHistoryProps {
   chatHistory: ChatSession[];
   onSessionClick: (sessionId: string) => void;
   onDeleteHistoryClick: (sessionId: string) => void;
+  currentChatSessionId: string;
 }
 
-export function ChatHistory({ chatHistory, onSessionClick, onDeleteHistoryClick, }: ChatHistoryProps) {
+export function ChatHistory({ chatHistory, onSessionClick, onDeleteHistoryClick, currentChatSessionId }: ChatHistoryProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
@@ -53,7 +54,11 @@ export function ChatHistory({ chatHistory, onSessionClick, onDeleteHistoryClick,
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="flex items-center justify-between text-sm text-gray-300 dark:text-gray-400 p-2 rounded-md hover:bg-blue-500 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
+              className={`flex items-center justify-between text-sm p-2 rounded-md transition-colors cursor-pointer ${
+                chat.session_id === currentChatSessionId
+                  ? 'bg-blue-600 text-white' // Highlight class for the active session
+                  : 'text-gray-300 dark:text-gray-400 hover:bg-blue-500 dark:hover:bg-blue-900/20'
+              }`}
             >
               <div
                 onClick={() => onSessionClick(chat.session_id)}

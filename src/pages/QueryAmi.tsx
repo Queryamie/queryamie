@@ -276,6 +276,7 @@ export default function QueryAmi() {
                     errorMessage={errorMessage}
                     isLoading={isLoading}
                     isSubmitted={isSubmitted}
+                    currentChatSessionId={currentChatSessionId}
                 />
                 <main className="flex-1 overflow-hidden">
                     <ChatWindow
