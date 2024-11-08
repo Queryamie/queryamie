@@ -169,10 +169,10 @@ function continueChat(message: string, sender: string) {
         }
 
         // call function to be saving messages of user and queryAmie
-        if (isContinuousChat) {
+        if (botResponse && botResponse.trim() && isContinuousChat) {
           continueChat(trimmedMessage, 'user');
           setTimeout(() => {
-              continueChat(botResponse, 'QueryAmie');
+            continueChat(botResponse, 'QueryAmie');
           }, 2000);
         }
       

@@ -5,7 +5,8 @@ import { motion, Variants, useInView, useAnimation } from "framer-motion"
 import { ReactTyped } from 'react-typed'
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { MessageSquare, FileText, Zap, ArrowRight, ChevronRight, Mail, Twitter, Linkedin } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { MessageSquare, FileText, FileUp, Zap, ArrowRight, ChevronRight, Mail, Twitter, Linkedin } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 // Custom hook for scroll animations
@@ -224,6 +225,56 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* How to use app section */}
+        <motion.section
+          id="howTOUse"
+          className="py-20 bg-indigo-50 dark:bg-gray-900"
+          ref={featuresAnimation.ref}
+          variants={containerVariants}
+          initial="hidden"
+          animate={featuresAnimation.mainControls}
+        >
+          <div className="container mx-auto px-4">
+            <motion.h2 
+              className="text-4xl sm:text-5xl font-bold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400"
+              variants={itemVariants}
+            >
+              How to Use QueryAmie
+            </motion.h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <motion.div variants={itemVariants}>
+                <Card className="bg-white dark:bg-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <FileUp className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Upload Files</h3>
+                    </div>
+                    <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
+                      <li>Upload files and wait for confirmation of successful submission</li>
+                      {/* <li>Wait for confirmation of successful submission.</li> */}
+                      <li>Proceed to ask questions about your uploaded documents</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <Card className="bg-white dark:bg-gray-700 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <MessageSquare className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Start or Continue a Chat</h3>
+                    </div>
+                    <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
+                      <li>Ensure a document has been uploaded to start or continue a chat session.</li>
+                      <li>You cannot send a message if no document is uploaded.</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        </motion.section>
 
         {/* Features Section */}
         <motion.section
