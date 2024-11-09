@@ -18,6 +18,8 @@ interface ChatWindowProps {
   setChatErrorMessage: React.Dispatch<React.SetStateAction<Message | null>>;
   isNewChat: boolean;
   setIsNewChat: React.Dispatch<React.SetStateAction< boolean >>;
+  isContinuousChat: boolean;
+  setIsContinuousChat: React.Dispatch<React.SetStateAction< boolean >>;
   chatHistoryMessages: Message[];
   currentChatSessionId: string;
   setCurrentChatSessionId: React.Dispatch<React.SetStateAction<string>>;
@@ -29,11 +31,11 @@ interface Message {
 }
 
 
-export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
+export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, isContinuousChat, setIsContinuousChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
   const [message, setMessage] = useState("");
   const [firstResponse, setFirstResponse] = useState("");
   const [isFirstResponse, setIsFirstResponse] = useState(true);
-  const [isContinuousChat, setIsContinuousChat] = useState(false);
+  // const [isContinuousChat, setIsContinuousChat] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [isLoading, setIsLoading] = useState(false)
   const hasMessages = chatMessages.length > 0 || chatErrorMessage;

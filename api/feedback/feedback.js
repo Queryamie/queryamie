@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
                 <footer style="margin-top: 30px; text-align: center; color: #718096; font-size: 12px;">
                 <p>&copy; ${new Date().getFullYear()} QueryAmie. All rights reserved.</p>
-                <p>Follow us on our journey to provide meaningful solutions.</p>
+                <p>Unlock The Power of Your Document With AI.</p>
                 </footer>
             </div>
             `,

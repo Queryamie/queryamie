@@ -28,6 +28,7 @@ export default function QueryAmi() {
     const [chatErrorMessage, setChatErrorMessage] = useState<Message | null>(null);
     const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
     const [isNewChat, setIsNewChat] = useState(true);
+    const [isContinuousChat, setIsContinuousChat] = useState(false);
     const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
     const [chatHistoryMessages, setChatHistoryMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -156,6 +157,7 @@ export default function QueryAmi() {
                         setIsSubmitSuccessful(false)    //user must submit before they can continue to chat
                         setIsSubmitted(false); //clear message and show the submit button again.
                         setIsNewChat(false);    //don't start a new chat
+                        setIsContinuousChat(true); //continue new chat
                     }
                 }
             } catch (error) {
@@ -291,6 +293,8 @@ export default function QueryAmi() {
                         setChatErrorMessage={setChatErrorMessage}
                         isNewChat={isNewChat}
                         setIsNewChat={setIsNewChat}
+                        isContinuousChat={isContinuousChat}
+                        setIsContinuousChat={setIsContinuousChat}
                         chatHistoryMessages={chatHistoryMessages}
                         currentChatSessionId={currentChatSessionId}
                         setCurrentChatSessionId={setCurrentChatSessionId}
