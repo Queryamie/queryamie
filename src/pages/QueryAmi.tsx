@@ -153,7 +153,9 @@ export default function QueryAmi() {
                     setChatHistoryMessages(data.messages);
                     setIsSidebarOpen(false) //close side bar
                     if(sessionId !== currentChatSessionId){
+                        console.log("fetched chat history messages, the session id for fetching old messages: ", sessionId);
                         setCurrentChatSessionId(sessionId);
+                        console.log("i have updated the current chat session id to the old chat: ", currentChatSessionId);
                         setIsSubmitSuccessful(false)    //user must submit before they can continue to chat
                         setIsSubmitted(false); //clear message and show the submit button again.
                         setIsNewChat(false);    //don't start a new chat

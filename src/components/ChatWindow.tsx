@@ -35,7 +35,6 @@ export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSi
   const [message, setMessage] = useState("");
   const [firstResponse, setFirstResponse] = useState("");
   const [isFirstResponse, setIsFirstResponse] = useState(true);
-  // const [isContinuousChat, setIsContinuousChat] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [isLoading, setIsLoading] = useState(false)
   const hasMessages = chatMessages.length > 0 || chatErrorMessage;
@@ -140,6 +139,7 @@ function continueChat(message: string, sender: string) {
 
 
   const handleSendMessage = async () => {
+    console.log("before sending the user message, this is the session id: ", currentChatSessionId);
     if (message.trim()) {
       const trimmedMessage = message.trim();
 
@@ -172,6 +172,7 @@ function continueChat(message: string, sender: string) {
 
         // call function to be saving messages of user and queryAmie
         if (trimmedMessage && botResponse && botResponse.trim() !== "" && isContinuousChat) {
+          console.log("I'm supposed to update the continue chat. trimmed: ", trimmedMessage, " bot:", botResponse);
           continueChat(trimmedMessage, 'user');
           setTimeout(() => {
             continueChat(botResponse, 'QueryAmie');
