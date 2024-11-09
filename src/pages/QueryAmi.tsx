@@ -136,6 +136,11 @@ export default function QueryAmi() {
         }
     };
 
+
+    useEffect(() => {
+        console.log("Received chat session ID in ChatWindow:", currentChatSessionId);
+    }, [currentChatSessionId]);
+
     // Fetch messages for the selected session
     const handleFetchSessionMessages = async (sessionId:string) => {
         if(sessionId) {
@@ -301,7 +306,7 @@ export default function QueryAmi() {
                         isContinuousChat={isContinuousChat}
                         setIsContinuousChat={setIsContinuousChat}
                         chatHistoryMessages={chatHistoryMessages}
-                        currentChatSessionId={historyCurrentChatSessionId}
+                        currentChatSessionId={currentChatSessionId}
                         setCurrentChatSessionId={setCurrentChatSessionId}
                     />
                     <Button

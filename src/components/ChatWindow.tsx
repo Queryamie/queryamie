@@ -49,6 +49,12 @@ export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSi
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  
+  useEffect(() => {
+    console.log("Received chat session ID in ChatWindow:", currentChatSessionId);
+  }, [currentChatSessionId]);
+
+
 
   useEffect(() => {
     if (chatContainerRef.current) {
