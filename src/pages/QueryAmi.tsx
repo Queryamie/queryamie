@@ -158,6 +158,7 @@ export default function QueryAmi() {
                         setCurrentChatSessionId(sessionId);
                         historyCurrentChatSessionId = sessionId;
                         console.log("i have updated the current chat session id to the old chat: ", currentChatSessionId);
+                        console.log("i have updated the current chat session id to the old chat using direct: ", historyCurrentChatSessionId);
                         setIsSubmitSuccessful(false)    //user must submit before they can continue to chat
                         setIsSubmitted(false); //clear message and show the submit button again.
                         setIsNewChat(false);    //don't start a new chat
