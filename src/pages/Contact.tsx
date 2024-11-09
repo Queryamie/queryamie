@@ -177,7 +177,7 @@ export default function Contact() {
 
       <footer className="bg-gray-800 py-8 mt-12">
         <div className="container mx-auto px-4 text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} QueryAmi. All rights reserved.
+          © {new Date().getFullYear()} QueryAmie. All rights reserved.
         </div>
       </footer>
     </div>

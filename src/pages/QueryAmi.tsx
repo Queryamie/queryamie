@@ -155,6 +155,7 @@ export default function QueryAmi() {
                         setCurrentChatSessionId(sessionId);
                         setIsSubmitSuccessful(false)    //user must submit before they can continue to chat
                         setIsSubmitted(false); //clear message and show the submit button again.
+                        setIsNewChat(false);    //don't start a new chat
                     }
                 }
             } catch (error) {
