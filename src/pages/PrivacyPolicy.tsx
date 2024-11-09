@@ -57,7 +57,7 @@ export default function PrivacyPolicy() {
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">5. Contact Us</h2>
-          <p>If you have any questions about this privacy policy, please contact us at: queryamie@gmail.com</p>
+          <p>If you have any questions about this privacy policy, please contact us at: queryamiee@gmail.com</p>
         </section>
       </main>
 
