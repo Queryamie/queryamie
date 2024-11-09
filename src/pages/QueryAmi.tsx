@@ -35,6 +35,7 @@ export default function QueryAmi() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [currentChatSessionId, setCurrentChatSessionId] = useState('');
+    let historyCurrentChatSessionId = '';
     
     const navigate = useNavigate();
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -155,6 +156,7 @@ export default function QueryAmi() {
                     if(sessionId !== currentChatSessionId){
                         console.log("fetched chat history messages, the session id for fetching old messages: ", sessionId);
                         setCurrentChatSessionId(sessionId);
+                        historyCurrentChatSessionId = sessionId;
                         console.log("i have updated the current chat session id to the old chat: ", currentChatSessionId);
                         setIsSubmitSuccessful(false)    //user must submit before they can continue to chat
                         setIsSubmitted(false); //clear message and show the submit button again.
@@ -298,7 +300,7 @@ export default function QueryAmi() {
                         isContinuousChat={isContinuousChat}
                         setIsContinuousChat={setIsContinuousChat}
                         chatHistoryMessages={chatHistoryMessages}
-                        currentChatSessionId={currentChatSessionId}
+                        currentChatSessionId={historyCurrentChatSessionId}
                         setCurrentChatSessionId={setCurrentChatSessionId}
                     />
                     <Button
