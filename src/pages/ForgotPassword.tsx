@@ -91,6 +91,7 @@ export default function ForgotPassword() {
           <div className="text-center text-gray-200">
             <p>A password reset link has been sent to your email address.</p>
             <p>Please check your inbox and follow the instructions.</p>
+            <p>If you don't see the email, please check your spam or junk folder.</p>
           </div>
         )}
         <div className="text-center">
