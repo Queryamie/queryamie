@@ -23,6 +23,10 @@ interface ChatWindowProps {
   chatHistoryMessages: Message[];
   currentChatSessionId: string;
   setCurrentChatSessionId: React.Dispatch<React.SetStateAction<string>>;
+  documentSessionId: string;
+  setDocumentSessionId: React.Dispatch<React.SetStateAction<string>>;
+  isFirstMessage: boolean;
+  setIsFirstMessage: React.Dispatch<React.SetStateAction< boolean >>;
 }
 
 interface Message {
@@ -31,7 +35,7 @@ interface Message {
 }
 
 
-export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, isContinuousChat, setIsContinuousChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
+export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, isContinuousChat, setIsContinuousChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId, documentSessionId, setDocumentSessionId, isFirstMessage, setIsFirstMessage}: ChatWindowProps) {
   const [message, setMessage] = useState("");
   const [firstResponse, setFirstResponse] = useState("");
   const [isFirstResponse, setIsFirstResponse] = useState(true);
@@ -51,6 +55,9 @@ export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSi
 
 
   useEffect(() => {
+    if(currentChatSessionId){
+      console.log("i have the current chat session id");
+    }
   }, [currentChatSessionId]);
 
 
@@ -150,42 +157,37 @@ function continueChat(message: string, sender: string) {
       try {
         setChatErrorMessage(null);
 
-        
         setChatMessages((prevMessages) => [...prevMessages, { sender: 'user', message: trimmedMessage }]);
         setMessage("");
         setIsLoading(true);
 
         const token = sessionStorage.getItem("token");
+        const session_id = sessionStorage.getItem("session_id");
+        const session_id_as_int = session_id ? parseInt(session_id, 10) : null;
 
-        const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/chat`, 
-          { question: trimmedMessage }, 
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+        console.log(trimmedMessage, session_id_as_int, isFirstMessage);
+
+        if (session_id_as_int) {
+          const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/chat`, 
+            { 
+              question: trimmedMessage,
+              session_id: session_id_as_int,
+              is_new_session: isFirstMessage,
+            }, 
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              }
             }
-          }
-        );
+          );
 
-        const botResponse = response.data.answer; //response from queryAmie
+          const botResponse = response.data.answer;
 
-        // save the new message in the database for starting a chat
-        if(isNewChat) {
-          startNewChat(trimmedMessage, botResponse);
-        }
-
-        // call function to be saving messages of user and queryAmie
-        if (trimmedMessage && botResponse && botResponse.trim() !== "" && isContinuousChat) {
-          continueChat(trimmedMessage, 'user');
-          setTimeout(() => {
-            continueChat(botResponse, 'QueryAmie');
-          }, 2000);
-        }
-      
-        setIsLoading(false);
-        setChatErrorMessage(null);
-        setChatMessages((prevMessages) => [...prevMessages, { sender: 'QueryAmie', message: botResponse }]);
-
+          setIsLoading(false);
+          setChatErrorMessage(null);
+          setChatMessages((prevMessages) => [...prevMessages, { sender: 'QueryAmie', message: botResponse }]);
+        }  
       } catch (error) {
         console.error("Error sending message:", error);
         setIsLoading(false);

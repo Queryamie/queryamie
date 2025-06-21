@@ -15,7 +15,7 @@ interface ChatHistoryProps {
   currentChatSessionId: string;
 }
 
-export function ChatHistory({ chatHistory, onSessionClick, onDeleteHistoryClick, currentChatSessionId }: ChatHistoryProps) {
+export function ChatHistory({ chatHistory=[], onSessionClick, onDeleteHistoryClick, currentChatSessionId }: ChatHistoryProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 

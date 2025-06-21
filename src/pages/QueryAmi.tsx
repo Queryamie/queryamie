@@ -35,6 +35,8 @@ export default function QueryAmi() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [currentChatSessionId, setCurrentChatSessionId] = useState('');
+    const [documentSessionId, setDocumentSessionId] = useState('');
+    const [isFirstMessage, setIsFirstMessage] = useState(false);
     
     const navigate = useNavigate();
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -78,7 +80,10 @@ export default function QueryAmi() {
                         'Authorization': `Bearer ${token}` // Add the authorization header
                     }
                 });
+                console.log(response.data);
                 console.log("Files uploaded successfully:", response.data.msg);
+                console.log("upload session id: ",response.data.session_id)
+                setDocumentSessionId(response.data.session_id);
                 setIsSubmitSuccessful(true);
                 setIsLoading(false);
                 setIsSubmitted(true);
@@ -93,51 +98,106 @@ export default function QueryAmi() {
             setErrorMessage("Please upload a new file to submit");
         }
     };
-            
+    
 
-    const handleNewChat = () => {
-        setCurrentChatSessionId('');
-        setUploadedFiles([]);
-        setChatMessages([]);
-        setIsSubmitSuccessful(false);
-        setIsSubmitted(false);
-        setChatErrorMessage(null);
-        setIsNewChat(true);
-    };
-
-
-    useEffect(() => {
-        fetchChatHistory();
-        const interval = setInterval(fetchChatHistory, 1000);
-        return () => clearInterval(interval);
-    }, []);
-
-
-    // This is for fetching all the chat history
-    const fetchChatHistory = async () => {
+    const handleNewChat = async () => {
+        console.log("new chat clicked");
         try {
-            const response = await axios.get(
-                `/api/chat/getChatSessions`,
+            const token = sessionStorage.getItem("token");
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/new_chat`,
                 {
-                    params: {
-                        user_id: sessionStorage.getItem("userId"),
+                    initial_query: "User clicked on new chat"
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     }
                 }
             );
-            const data = response.data;
-            if (data.error) {
-                console.error("Error", data.error);
-            } else {
-                setChatHistory(data.chat_sessions);
-            }
+    
+            
+            const session_id = response.data.id;
+            console.log("New chat session id: ", session_id);
+            sessionStorage.setItem("session_id", session_id);
+            setCurrentChatSessionId(session_id.toString());
+            setIsFirstMessage(true);
+
+            setCurrentChatSessionId('');
+            setUploadedFiles([]);
+            setChatMessages([]);
+            setIsSubmitSuccessful(false);
+            setIsSubmitted(false);
+            setChatErrorMessage(null);
+            setIsNewChat(true);
+
         } catch (error) {
-            console.error("Error:", error);
+            console.error(error);
         }
     };
 
 
     useEffect(() => {
+        fetchChatHistory();
+        // const interval = setInterval(fetchChatHistory, 1000);
+        // return () => clearInterval(interval);
+    }, []);
+
+
+    // This is for fetching all the chat history
+    // const fetchChatHistory = async () => {
+    //     try {
+    //         const response = await axios.get(
+    //             `/api/chat/getChatSessions`,
+    //             {
+    //                 params: {
+    //                     user_id: sessionStorage.getItem("userId"),
+    //                 }
+    //             }
+    //         );
+    //         const data = response.data;
+    //         if (data.error) {
+    //             console.error("Error", data.error);
+    //         } else {
+    //             setChatHistory(data.chat_sessions);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error:", error);
+    //     }
+    // };
+
+    const fetchChatHistory = async () => {
+        try {
+            const token = sessionStorage.getItem("token");
+    
+            // Check if token exists to avoid making a request with an undefined Authorization header
+            if (!token) {
+                console.error('No token found in sessionStorage');
+                return;
+            }
+    
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_API}/user/sessions`, {
+                headers: {
+                    'Authorization': `Bearer ${token}` // Corrected template literal for Authorization header
+                }
+            });
+    
+            // Log and return response data for further processing
+            console.log("Backend response:", response);
+            console.log("Session data:", response.data); // Display or process the session list here
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching chat sessions:', error);
+        }
+    };
+
+    useEffect(() => {
+        console.log("currentChatSessionId changed:", currentChatSessionId);
     }, [currentChatSessionId]);
+
+    useEffect(() => {
+    }, [documentSessionId]);
+
 
     // Fetch messages for the selected session
     const handleFetchSessionMessages = async (sessionId:string) => {
@@ -302,6 +362,10 @@ export default function QueryAmi() {
                         chatHistoryMessages={chatHistoryMessages}
                         currentChatSessionId={currentChatSessionId}
                         setCurrentChatSessionId={setCurrentChatSessionId}
+                        documentSessionId={documentSessionId}
+                        setDocumentSessionId={setDocumentSessionId}
+                        isFirstMessage={isFirstMessage}
+                        setIsFirstMessage={setIsFirstMessage}    
                     />
                     <Button
                     onClick={handleSubmitFiles}
