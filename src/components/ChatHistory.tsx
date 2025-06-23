@@ -1,21 +1,25 @@
-import { useState } from "react";
-import { MessageSquare, Trash2, Edit2 } from "lucide-react";
-import { motion } from "framer-motion";
+"use client"
+
+import { useState } from "react"
+import { MessageSquare, Trash2, Edit2 } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 interface ChatSession {
-  chat_id: string;
-  name: string | null;
-  status: string;
-  created_at: string;
-  updated_at: string;
+  chat_id: string
+  name: string | null
+  status: string
+  created_at: string
+  updated_at: string
 }
 
 interface ChatHistoryProps {
-  chatHistory: ChatSession[];
-  onSessionClick: (sessionId: string) => void;
-  onDeleteHistoryClick: (sessionId: string) => void;
-  onRenameSession: (sessionId: string, newName: string) => void;
-  currentChatSessionId: string;
+  chatHistory: ChatSession[]
+  onSessionClick: (sessionId: string) => void
+  onDeleteHistoryClick: (sessionId: string) => void
+  onRenameSession: (sessionId: string, newName: string) => void
+  currentChatSessionId: string
 }
 
 export function ChatHistory({
@@ -25,172 +29,196 @@ export function ChatHistory({
   onRenameSession,
   currentChatSessionId,
 }: ChatHistoryProps) {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
-  const [sessionToRename, setSessionToRename] = useState<string | null>(null);
-  const [newName, setNewName] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
+  const [sessionToRename, setSessionToRename] = useState<string | null>(null)
+  const [newName, setNewName] = useState("")
 
   const handleDeleteClick = (sessionId: string) => {
-    setSessionToDelete(sessionId);
-    setIsDeleteModalOpen(true);
-  };
+    setSessionToDelete(sessionId)
+    setIsDeleteModalOpen(true)
+  }
 
   const confirmDelete = () => {
     if (sessionToDelete) {
-      onDeleteHistoryClick(sessionToDelete);
+      onDeleteHistoryClick(sessionToDelete)
     }
-    setIsDeleteModalOpen(false);
-    setSessionToDelete(null);
-  };
+    setIsDeleteModalOpen(false)
+    setSessionToDelete(null)
+  }
 
   const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-    setSessionToDelete(null);
-  };
+    setIsDeleteModalOpen(false)
+    setSessionToDelete(null)
+  }
 
   const handleRenameClick = (sessionId: string, currentName: string | null) => {
-    setSessionToRename(sessionId);
-    setNewName(currentName || "");
-    setIsRenameModalOpen(true);
-  };
+    setSessionToRename(sessionId)
+    setNewName(currentName || "")
+    setIsRenameModalOpen(true)
+  }
 
   const confirmRename = () => {
     if (sessionToRename && newName.trim()) {
-      onRenameSession(sessionToRename, newName.trim());
-      setIsRenameModalOpen(false);
-      setSessionToRename(null);
-      setNewName("");
+      onRenameSession(sessionToRename, newName.trim())
+      setIsRenameModalOpen(false)
+      setSessionToRename(null)
+      setNewName("")
     }
-  };
+  }
 
   const closeRenameModal = () => {
-    setIsRenameModalOpen(false);
-    setSessionToRename(null);
-    setNewName("");
-  };
+    setIsRenameModalOpen(false)
+    setSessionToRename(null)
+    setNewName("")
+  }
 
-  // Filter chat sessions to only show those with valid names
-  const filteredChatHistory = chatHistory.filter(session => session.name && session.name.trim());
+  const filteredChatHistory = chatHistory.filter((session) => session.name && session.name.trim())
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-white flex items-center">
+        <MessageSquare className="h-5 w-5 mr-2 text-purple-400" />
         Chat History
       </h3>
       {filteredChatHistory.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          No named chat sessions yet
-        </p>
-      ) : (
-        <ul className="space-y-1">
-          {filteredChatHistory.map((session, index) => (
-            <motion.li
-              key={session.chat_id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`flex items-center justify-between text-sm p-2 rounded-md ${
-                session.chat_id === currentChatSessionId
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              <div
-                onClick={() => onSessionClick(session.chat_id)}
-                className="flex items-center cursor-pointer flex-grow"
-              >
-                <MessageSquare className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400" />
-                {session.name}
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRenameClick(session.chat_id, session.name);
-                  }}
-                  className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
-                  aria-label="Rename session"
-                >
-                  <Edit2 className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteClick(session.chat_id);
-                  }}
-                  className="text-red-500 hover:text-red-600 dark:hover:text-red-400"
-                  aria-label="Delete session"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </motion.li>
-          ))}
-        </ul>
-      )}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Confirm Deletion
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-              Are you sure you want to delete this chat session? This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-2 mt-4">
-              <button
-                onClick={closeDeleteModal}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+        <div className="text-center py-8">
+          <MessageSquare className="h-12 w-12 text-gray-500 mx-auto mb-3" />
+          <p className="text-sm text-gray-400">No named chat sessions yet</p>
         </div>
-      )}
-      {isRenameModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Rename Chat Session
-            </h3>
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="mt-2 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter new chat name"
-              maxLength={50}
-            />
-            <div className="flex justify-end space-x-2 mt-4">
-              <button
-                onClick={closeRenameModal}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmRename}
-                disabled={!newName.trim()}
-                className={`px-4 py-2 rounded-md text-white ${
-                  newName.trim()
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'bg-gray-500 cursor-not-allowed'
+      ) : (
+        <div className="space-y-2">
+          <AnimatePresence>
+            {filteredChatHistory.map((session, index) => (
+              <motion.div
+                key={session.chat_id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ delay: index * 0.1 }}
+                className={`group backdrop-blur-sm rounded-xl p-3 border transition-all duration-200 cursor-pointer ${
+                  session.chat_id === currentChatSessionId
+                    ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/50 shadow-lg"
+                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                 }`}
               >
-                Rename
-              </button>
-            </div>
-          </div>
+                <div onClick={() => onSessionClick(session.chat_id)} className="flex items-center justify-between">
+                  <div className="flex items-center flex-grow min-w-0">
+                    <MessageSquare className="h-4 w-4 mr-3 text-purple-400 flex-shrink-0" />
+                    <span className="text-white text-sm truncate font-medium">{session.name}</span>
+                  </div>
+                  <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleRenameClick(session.chat_id, session.name)
+                      }}
+                      className="h-8 w-8 text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                    >
+                      <Edit2 className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteClick(session.chat_id)
+                      }}
+                      className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
+
+      {/* Delete Modal */}
+      <AnimatePresence>
+        {isDeleteModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="backdrop-blur-md bg-white/10 border border-white/20 p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4"
+            >
+              <h3 className="text-lg font-semibold text-white mb-3">Confirm Deletion</h3>
+              <p className="text-sm text-gray-300 mb-6">
+                Are you sure you want to delete this chat session? This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <Button
+                  variant="ghost"
+                  onClick={closeDeleteModal}
+                  className="text-gray-400 hover:text-white hover:bg-white/20"
+                >
+                  Cancel
+                </Button>
+                <Button onClick={confirmDelete} className="bg-red-500 hover:bg-red-600 text-white">
+                  Delete
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Rename Modal */}
+      <AnimatePresence>
+        {isRenameModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="backdrop-blur-md bg-white/10 border border-white/20 p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4"
+            >
+              <h3 className="text-lg font-semibold text-white mb-3">Rename Chat Session</h3>
+              <Input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="mb-6 bg-white/10 backdrop-blur-sm text-white border-white/20 focus:border-purple-400 focus:ring-purple-400/20 placeholder-gray-400"
+                placeholder="Enter new chat name"
+                maxLength={50}
+              />
+              <div className="flex justify-end space-x-3">
+                <Button
+                  variant="ghost"
+                  onClick={closeRenameModal}
+                  className="text-gray-400 hover:text-white hover:bg-white/20"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmRename}
+                  disabled={!newName.trim()}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Rename
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
-  );
+  )
 }
