@@ -1,32 +1,49 @@
-import { FileUpload } from './FileUpload'
-import { ChatHistory } from './ChatHistory'
-import { Button } from '@/components/ui/button'
-import { X } from 'lucide-react'
+import { FileUpload } from './FileUpload';
+import { ChatHistory } from './ChatHistory';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 interface ChatSession {
-  session_id: string;
-  session_name: string;
+  chat_id: string;
+  name: string | null;
+  status: string;
   created_at: string;
+  updated_at: string;
 }
 
-
 interface SidebarProps {
-  isOpen: boolean,
-  onClose: () => void,
-  uploadedFiles: File[],
-  onFileUpload: (files: File[]) => void,
-  handleRemoveFile: (file: File) => void,
-  onSubmitFiles: () => void,
+  isOpen: boolean;
+  onClose: () => void;
+  uploadedFiles: File[];
+  onFileUpload: (files: File[]) => void;
+  handleRemoveFile: (file: File) => void;
+  onSubmitFiles: () => void;
   chatHistory: ChatSession[];
   onSessionClick: (sessionId: string) => void;
   onDeleteHistoryClick: (sessionId: string) => void;
-  errorMessage: string | null,
-  isLoading: boolean,
-  isSubmitted: boolean,
+  onRenameSession: (sessionId: string, newName: string) => void;
+  errorMessage: string | null;
+  isLoading: boolean;
+  isSubmitted: boolean;
   currentChatSessionId: string;
 }
 
-export default function Sidebar({ isOpen, onClose, uploadedFiles, onFileUpload, handleRemoveFile, onSubmitFiles, chatHistory, onSessionClick, onDeleteHistoryClick, errorMessage, isLoading, isSubmitted, currentChatSessionId}: SidebarProps) {
+export default function Sidebar({
+  isOpen,
+  onClose,
+  uploadedFiles,
+  onFileUpload,
+  handleRemoveFile,
+  onSubmitFiles,
+  chatHistory,
+  onSessionClick,
+  onDeleteHistoryClick,
+  onRenameSession,
+  errorMessage,
+  isLoading,
+  isSubmitted,
+  currentChatSessionId,
+}: SidebarProps) {
   return (
     <div
       className={`fixed inset-y-0 left-0 z-50 w-72 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
@@ -34,10 +51,10 @@ export default function Sidebar({ isOpen, onClose, uploadedFiles, onFileUpload, 
       } md:relative md:translate-x-0`}
     >
       <div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="md:hidden text-gray-400 hover:text-gray-100" 
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden text-gray-400 hover:text-gray-100"
           onClick={onClose}
         >
           <X className="h-6 w-6" />
@@ -57,9 +74,10 @@ export default function Sidebar({ isOpen, onClose, uploadedFiles, onFileUpload, 
           chatHistory={chatHistory}
           onSessionClick={onSessionClick}
           onDeleteHistoryClick={onDeleteHistoryClick}
+          onRenameSession={onRenameSession}
           currentChatSessionId={currentChatSessionId}
         />
       </div>
     </div>
-  )
+  );
 }

@@ -46,7 +46,7 @@ export default function Contact() {
         });
         
         const token = response.data.access_token;
-        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("access_token", token);
     
         setIsSubmitted(true)
         setName('')

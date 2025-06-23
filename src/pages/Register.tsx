@@ -59,9 +59,9 @@ export default function Register() {
       })
       
       const token = response.data.access_token
-      sessionStorage.setItem("token", token)
+      sessionStorage.setItem("access_token", token)
     
-      navigate("/Login")
+      navigate("/login")
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.msg) {
         setErrorMessage(error.response.data.msg)
@@ -199,7 +199,7 @@ export default function Register() {
         <div className="text-center">
           <p className="text-gray-400">
             Already have an account?{" "}
-            <a onClick={() => {navigate("/Login")}} className="cursor-pointer text-blue-400 hover:text-blue-300">
+            <a onClick={() => {navigate("/login")}} className="cursor-pointer text-blue-400 hover:text-blue-300">
               Sign in
             </a>
           </p>

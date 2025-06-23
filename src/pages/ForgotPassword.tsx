@@ -95,7 +95,7 @@ export default function ForgotPassword() {
           </div>
         )}
         <div className="text-center">
-          <a onClick={() => {navigate("/Login")}} className="text-blue-400 hover:text-blue-300 cursor-pointer">
+          <a onClick={() => {navigate("/login")}} className="text-blue-400 hover:text-blue-300 cursor-pointer">
             Back to login
           </a>
         </div>

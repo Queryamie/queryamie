@@ -45,14 +45,15 @@ export default function Login() {
       )
       // set access token
       const token = response.data.access_token
-      sessionStorage.setItem("token", token)
+      sessionStorage.setItem("access_token", token)
 
       // set user id
       const userId = response.data.user_id
       sessionStorage.setItem("userId", userId)
   
-      navigate("/QueryAmi")
+      navigate("/chat")
     } catch (error: any) {
+      console.log('error',error.response)
       setErrorMessage(error.response.data.detail)
       setIsLoading(false)
     } finally {
@@ -111,7 +112,7 @@ export default function Login() {
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <a onClick={() => {navigate("/ForgotPassword")}} className="cursor-pointer text-sm text-blue-400 hover:text-blue-300">
+            <a onClick={() => {navigate("/forgot-password")}} className="cursor-pointer text-sm text-blue-400 hover:text-blue-300">
               Forgot your password?
             </a>
           </div>
@@ -134,7 +135,7 @@ export default function Login() {
         <div className="text-center">
           <p className="text-gray-400">
             Don't have an account?{" "}
-            <a onClick={() => {navigate("/Register")}} className="cursor-pointer text-blue-400 hover:text-blue-300">
+            <a onClick={() => {navigate("/register")}} className="cursor-pointer text-blue-400 hover:text-blue-300">
               Sign up
             </a>
           </p>

@@ -95,10 +95,10 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center space-x-4">
-            <a onClick={() => {navigate("/Login")}}>
+            <a onClick={() => {navigate("/login")}}>
               <Button variant="outline" className="text-indigo-600 dark:text-indigo-400 border-indigo-600 dark:border-indigo-400">Log In</Button>
             </a>
-            <a onClick={() => {navigate("/Register")}}>
+            <a onClick={() => {navigate("/register")}}>
               <Button className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white">
                 Sign Up
               </Button>
@@ -150,7 +150,7 @@ export default function LandingPage() {
                 <Button 
                   size="lg" 
                   className="text-lg px-8 py-6 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white"
-                  onClick={() => navigate("/Login")}
+                  onClick={() => navigate("/login")}
                 >
                   Start for Free <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -370,7 +370,7 @@ export default function LandingPage() {
               Join thousands of users who are already leveraging the power of AI to interact with their documents.
             </motion.p>
             <motion.div variants={itemVariants}>
-              <a onClick={() => {navigate("/Register")}}>
+              <a onClick={() => {navigate("/register")}}>
                 <Button size="lg" className="text-lg px-8 py-6 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white">
                   Get Started for Free <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -390,9 +390,9 @@ export default function LandingPage() {
                 </span>
               </div>
               <nav className="flex flex-wrap gap-6">
-                <a onClick={() => {navigate("/Contact")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600  dark:hover:text-indigo-400 transition-colors">Contact Us</a>
-                <a onClick={() => {navigate("/PrivacyPolicy")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600  dark:hover:text-indigo-400 transition-colors">Privacy Policy</a>
-                <a onClick={() => {navigate("/TermsOfService")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Terms of Service</a>
+                <a onClick={() => {navigate("/contact")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600  dark:hover:text-indigo-400 transition-colors">Contact Us</a>
+                <a onClick={() => {navigate("/privacy")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600  dark:hover:text-indigo-400 transition-colors">Privacy Policy</a>
+                <a onClick={() => {navigate("/terms")}} className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Terms of Service</a>
               </nav>
             </div>
             <div className="mt-8 flex flex-wrap justify-between items-center">

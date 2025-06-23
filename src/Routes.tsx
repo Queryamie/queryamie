@@ -10,6 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 
 
 
@@ -17,15 +18,18 @@ import Contact from "./pages/Contact";
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      {/* Catch-all route */}
+      <Route path="*" element={<NotFound />} />
+
       <Route path="/" element={<LandingPage />} />
-      <Route path="/Login" element={<Login />} />
-      <Route path="/Register" element={<Register />} />
-      <Route path="/ForgotPassword" element={<ForgotPassword />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/ResetPassword" element={<ResetPassword />} />
-      <Route path="/QueryAmi" element={<QueryAmi />} />
-      <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-      <Route path="/TermsOfService" element={<TermsOfService />} />
-      <Route path="/Contact" element={<Contact />} />
+      <Route path="/chat" element={<QueryAmi />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/contact" element={<Contact />} />
     </Routes>
   );
 };

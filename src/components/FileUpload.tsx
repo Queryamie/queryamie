@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, File, Send, X, Loader2 } from "lucide-react";
+import { Upload, File, SendIcon, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FileUploadProps {
@@ -8,15 +8,22 @@ interface FileUploadProps {
   onFileUpload: (files: File[]) => void;
   handleRemoveFile: (file: File) => void;
   onSubmitFiles: () => void;
-  errorMessage: string | null,
-  isLoading: boolean,
-  isSubmitted: boolean,
+  errorMessage: string | null;
+  isLoading: boolean;
+  isSubmitted: boolean;
 }
 
-export function FileUpload({ uploadedFiles, onFileUpload, handleRemoveFile, onSubmitFiles, errorMessage, isLoading, isSubmitted}: FileUploadProps) {
+export function FileUpload({
+  uploadedFiles,
+  onFileUpload,
+  handleRemoveFile,
+  onSubmitFiles,
+  errorMessage,
+  isLoading,
+  isSubmitted,
+}: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -46,7 +53,7 @@ export function FileUpload({ uploadedFiles, onFileUpload, handleRemoveFile, onSu
       <motion.div
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
           isDragging
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+            ? "border-blue-500 bg-blue-900/10"
             : "border-gray-300 dark:border-gray-700"
         }`}
         onDragOver={handleDragOver}
@@ -71,64 +78,76 @@ export function FileUpload({ uploadedFiles, onFileUpload, handleRemoveFile, onSu
       </motion.div>
       <AnimatePresence>
         {uploadedFiles.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-2"
-          >
-            <h3 className="text-sm font-semibold text-gray-200 dark:text-gray-300">
-              Uploaded Files:
-            </h3>
-            <ul className="space-y-1">
-              {uploadedFiles.map((file, index) => (
-                <motion.li
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between text-sm text-gray-200 dark:text-gray-400 bg-gray-800 rounded-md p-2"
-                >
-                  <div className="flex items-center">
-                    <File className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400" />
-                    {file.name}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 rounded-full hover:bg-gray-700"
-                    onClick={() => handleRemoveFile(file)}
-                  >
-                    <X className="h-4 w-4 text-gray-400 hover:text-red-400" />
-                    <span className="sr-only">Remove file</span>
-                  </Button>
-                </motion.li>
-              ))}
-            </ul>
-            {errorMessage && <p className="text-red-600 text-sm mt-2.5 text-center">{errorMessage}</p>}
-            {!isSubmitted ? (
-              <Button
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                onClick={onSubmitFiles}
+          <ul className="space-y-2">
+            {uploadedFiles.map((file, index) => (
+              <motion.li
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: index * 0.1 }}
+                className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 p-2"
               >
-                {isLoading ? (
-                    <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting your files...
-                    </>
-                ) : (
-                    <>
-                    <Send className="mr-2 h-4 w-4"/>
-                    Submit Files
-                    </>
-                )}
-              </Button>            ) : (
-            <div className="text-center text-gray-200">
-                <p className="text-green-500">Files submitted successfully, you can start chatting now.</p>
-            </div>
-            )}
+                <div className="flex items-center">
+                  <File className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400" />
+                  <span>{file.name}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                  onClick={() => handleRemoveFile(file)}
+                >
+                  <X className="h-4 w-4 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-600" />
+                  <span className="sr-only">Remove file</span>
+                </Button>
+              </motion.li>
+            ))}
+          </ul>
+        )}
+        {errorMessage && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-red-600 dark:text-red-400 text-sm mt-2 text-center"
+          >
+            {errorMessage}
+          </motion.p>
+        )}
+        {!isLoading && !isSubmitted && uploadedFiles.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800"
+              onClick={onSubmitFiles}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <SendIcon className="mr-2 h-4 w-4" />
+                  Submit Files
+                </>
+              )}
+            </Button>
           </motion.div>
+        )}
+        {isSubmitted && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-green-600 dark:text-green-400 text-sm mt-2 text-center"
+          >
+            Files uploaded successfully, you can start chatting now.
+          </motion.p>
         )}
       </AnimatePresence>
     </div>
