@@ -1,5 +1,4 @@
 import axios from "axios"
-import { useTranslation } from "@/lib/TranslationContext"
 
 interface TranslationPayload {
   texts: Record<string, string>
