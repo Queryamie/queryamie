@@ -6,6 +6,7 @@ import { ReactTyped } from "react-typed"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent } from "@/components/ui/card"
+import { LanguageSelector } from "@/components/ui/language-selector"
 import {
   MessageSquare,
   FileText,
@@ -19,7 +20,7 @@ import {
   Sparkles,
   Brain,
 } from "lucide-react"
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 
 // Custom hook for scroll animations
 function useScrollAnimation() {
@@ -118,6 +119,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="flex items-center space-x-4">
+              <LanguageSelector />
               <Link to="/login">
                 <Button variant="ghost" className="text-white hover:bg-white/20 backdrop-blur-sm">
                   Log In

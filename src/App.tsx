@@ -1,14 +1,17 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import AppRoutes from './Routes';
+import { BrowserRouter } from 'react-router-dom';
+import Routes from './Routes';
+import { TranslationProvider } from './lib/TranslationContext';
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <div className="app-container">
-        <AppRoutes />
-      </div>
-    </Router>
+    <TranslationProvider>
+      <BrowserRouter>
+        <div className="app-container">
+          <Routes />
+        </div>
+      </BrowserRouter>
+    </TranslationProvider>
   );
 };
 
