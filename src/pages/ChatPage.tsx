@@ -153,6 +153,7 @@ const ChatPage: React.FC = () => {
   const loadChatSessions = async () => {
     try {
       const response = await apiCall('/chat/sessions');
+      console.log('response for chat sessions: ', response?.data)
       if (response) {
         const sessionsWithMessages = response.data.filter((session: ChatSession) => 
           session.analytics.message_count > 0
