@@ -1,0 +1,16 @@
+{
+  "name": "QueryAmie",
+  "short_name": "QueryAmie", 
+  "description": "AI-powered document chat with voice integration",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#1f2937",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

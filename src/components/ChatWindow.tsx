@@ -1,260 +1,400 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Send, PlusCircle, Bot, User, Paperclip, Loader, Sparkles, FileText } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import axios from "axios"
-import ReactMarkdown from "react-markdown"
+import { useState, useRef, useEffect } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Send, PlusCircle, Bot, User, Paperclip, Loader } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import axios from "axios";
+import VoiceButton from "./VoiceButton";
 
 interface ChatWindowProps {
-  isSubmitSuccessful: boolean
-  isSidebarOpen: boolean
-  toggleSidebar: () => void
-  onNewChat: () => void
-  chatMessages: Message[]
-  setChatMessages: React.Dispatch<React.SetStateAction<Message[]>>
-  chatErrorMessage: Message | null
-  setChatErrorMessage: React.Dispatch<React.SetStateAction<Message | null>>
-  isNewChat: boolean
-  setIsNewChat: React.Dispatch<React.SetStateAction<boolean>>
-  chatHistoryMessages: Message[]
-  currentChatSessionId: string
-  setCurrentChatSessionId: React.Dispatch<React.SetStateAction<string>>
+  isSubmitSuccessful: boolean;
+  isSidebarOpen: boolean,
+  toggleSidebar: () => void;
+  onNewChat: () => void;
+  chatMessages: Message[];
+  setChatMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  chatErrorMessage: Message | null;
+  setChatErrorMessage: React.Dispatch<React.SetStateAction<Message | null>>;
+  isNewChat: boolean;
+  setIsNewChat: React.Dispatch<React.SetStateAction< boolean >>;
+  isContinuousChat: boolean;
+  setIsContinuousChat: React.Dispatch<React.SetStateAction< boolean >>;
+  chatHistoryMessages: Message[];
+  currentChatSessionId: string;
+  setCurrentChatSessionId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Message {
-  id: string
-  sender_type: "user" | "assistant" | "error"
-  content: string
-  timestamp: string
-  file_context_used?: string[]
+  sender: 'user' | 'QueryAmie' | 'error';
+  message: string;
 }
 
-export default function ChatWindow({
-  isSubmitSuccessful,
-  isSidebarOpen,
-  toggleSidebar,
-  onNewChat,
-  chatMessages,
-  setChatMessages,
-  chatErrorMessage,
-  setChatErrorMessage,
-  setIsNewChat,
-  chatHistoryMessages,
-  currentChatSessionId,
-}: ChatWindowProps) {
-  const [message, setMessage] = useState("")
-  const [isSmallScreen, setIsSmallScreen] = useState(false)
+
+export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, isContinuousChat, setIsContinuousChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
+  const [message, setMessage] = useState("");
+  const [firstResponse, setFirstResponse] = useState("");
+  const [isFirstResponse, setIsFirstResponse] = useState(true);
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [isLoading, setIsLoading] = useState(false)
-  const hasMessages = chatMessages.length > 0 || chatErrorMessage
-  const chatContainerRef = useRef<HTMLDivElement>(null)
+  const hasMessages = chatMessages.length > 0 || chatErrorMessage;
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Debug logging
+  console.log('ChatWindow render - currentChatSessionId:', currentChatSessionId, 'isSubmitSuccessful:', isSubmitSuccessful);
+
+  // Effect to listen for window resize and update isSmallScreen
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   useEffect(() => {
-    const handleResize = () => setIsSmallScreen(window.innerWidth < 768)
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+  }, [currentChatSessionId]);
+
+
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [chatMessages, chatErrorMessage])
+  }, [chatMessages, chatErrorMessage]);
+
+
+  // Updated to use new enhanced chat system
+  useEffect(() => {
+    // Chat session management is now handled by the new startNewChatAndSendMessage function
+  }, [currentChatSessionId]);
+    
+
+
+  // Function to add messages from chat history to current chat
+  const addMessagesToChat = (chatHistoryMessages: Message[]) => {
+    chatHistoryMessages.forEach((msg) => {
+        setChatMessages((prevMessages) => [
+            ...prevMessages,
+            { sender: msg.sender, message: msg.message }
+        ]);
+    });
+  };
 
   useEffect(() => {
     if (chatHistoryMessages.length > 0) {
-      setChatMessages(chatHistoryMessages)
+      setChatMessages([]);
+        addMessagesToChat(chatHistoryMessages);
     }
-  }, [chatHistoryMessages, setChatMessages])
+  }, [chatHistoryMessages]);
+
+
+
+// Function to start a new chat session using enhanced MongoDB system
+function startNewChat() {
+  const token = sessionStorage.getItem("token");
+  
+  if (token) {
+    axios.post(`${import.meta.env.VITE_BACKEND_API}/chat/start`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then((response: any) => {
+        const data = response.data;
+        setCurrentChatSessionId(data.chat_id);  // Setting session ID
+        console.log("New chat session started:", data.chat_id);
+      })
+      .catch((error: any) => {
+        console.error("Error starting new chat:", error);
+        setChatErrorMessage({ sender: 'error', message: "Failed to start a new chat. Please try again." });
+      });
+  } else {
+    console.error("Authentication token needed");
+  }
+}
+
+
 
   const handleSendMessage = async () => {
-    if (!message.trim() || !currentChatSessionId) return
+    if (message.trim()) {
+      const trimmedMessage = message.trim();
 
-    const trimmedMessage = message.trim()
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      sender_type: "user",
-      content: trimmedMessage,
-      timestamp: new Date().toISOString(),
+      try {
+        setChatErrorMessage(null);
+
+        // If no chat session exists, start a new one
+        if (!currentChatSessionId) {
+          await startNewChatAndSendMessage(trimmedMessage);
+          return;
+        }
+
+        // Add user message to chat
+        setChatMessages((prevMessages) => [...prevMessages, { sender: 'user', message: trimmedMessage }]);
+        setMessage("");
+        setIsLoading(true);
+
+        const token = sessionStorage.getItem("token");
+
+        // Send message using enhanced chat system
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/chat/${currentChatSessionId}/message`, 
+          { content: trimmedMessage, stream: false }, 
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+
+        const botResponse = response.data.answer;
+        
+        setIsLoading(false);
+        setChatErrorMessage(null);
+        setChatMessages((prevMessages) => [...prevMessages, { sender: 'QueryAmie', message: botResponse }]);
+
+      } catch (error) {
+        console.error("Error sending message:", error);
+        setIsLoading(false);
+        setChatErrorMessage({ sender: 'error', message: "An unexpected error occurred. Please try again." });
+      }
     }
+  };
 
-    setChatMessages((prev) => [...prev, userMessage])
-    setMessage("")
-    setIsLoading(true)
-    setChatErrorMessage(null)
-
+  const startNewChatAndSendMessage = async (firstMessage: string) => {
     try {
-      console.log("this is the question: ", trimmedMessage)
-      const token = sessionStorage.getItem("access_token")
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_API}/chat/${currentChatSessionId}/message`,
-        { content: trimmedMessage },
+      const token = sessionStorage.getItem("token");
+      
+      // Start new chat session
+      const chatResponse = await axios.post(`${import.meta.env.VITE_BACKEND_API}/chat/start`, {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      
+      const chatId = chatResponse.data.chat_id;
+      setCurrentChatSessionId(chatId);
+      
+      // Add user message to chat
+      setChatMessages((prevMessages) => [...prevMessages, { sender: 'user', message: firstMessage }]);
+      setMessage("");
+      setIsLoading(true);
+
+      // Send the first message
+      const messageResponse = await axios.post(`${import.meta.env.VITE_BACKEND_API}/chat/${chatId}/message`, 
+        { content: firstMessage, stream: false }, 
         {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
 
-      const { answer } = response.data
-      const botMessage: Message = {
-        id: Date.now().toString(),
-        sender_type: "assistant",
-        content: answer,
-        timestamp: new Date().toISOString(),
-      }
+      const botResponse = messageResponse.data.answer;
+      
+      setIsLoading(false);
+      setIsNewChat(false);
+      setIsContinuousChat(true);
+      setChatMessages((prevMessages) => [...prevMessages, { sender: 'QueryAmie', message: botResponse }]);
 
-      setChatMessages((prev) => [...prev, botMessage])
-      setIsNewChat(false)
     } catch (error) {
-      console.error("Error sending message:", error)
-      setChatErrorMessage({
-        id: Date.now().toString(),
-        sender_type: "error",
-        content: "An unexpected error occurred. Please try again.",
-        timestamp: new Date().toISOString(),
-      })
-    } finally {
-      setIsLoading(false)
+      console.error("Error starting new chat:", error);
+      setIsLoading(false);
+      setChatErrorMessage({ sender: 'error', message: "Failed to start a new chat. Please try again." });
     }
-  }
+  };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+  const handleVoiceMessage = async (voiceMessage: string) => {
+    if (voiceMessage.trim()) {
+      const trimmedMessage = voiceMessage.trim();
+
+      try {
+        setChatErrorMessage(null);
+
+        // If no chat session exists, start a new one
+        if (!currentChatSessionId) {
+          await startNewChatAndSendMessage(trimmedMessage);
+          return;
+        }
+
+        // Add the voice message to chat immediately
+        setChatMessages((prevMessages) => [...prevMessages, { sender: 'user', message: trimmedMessage }]);
+        setIsLoading(true);
+
+        const token = sessionStorage.getItem("token");
+
+        // Send message using enhanced chat system
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/chat/${currentChatSessionId}/message`, 
+          { content: trimmedMessage, stream: false }, 
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+
+        const botResponse = response.data.answer;
+      
+        setIsLoading(false);
+        setChatErrorMessage(null);
+        setChatMessages((prevMessages) => [...prevMessages, { sender: 'QueryAmie', message: botResponse }]);
+
+      } catch (error) {
+        console.error("Error sending voice message:", error);
+        setIsLoading(false);
+        setChatErrorMessage({ sender: 'error', message: "An unexpected error occurred with voice message. Please try again." });
+      }
     }
-  }
+  };
+
 
   return (
-    <div className="flex flex-col h-full w-full backdrop-blur-sm bg-white/5 overflow-y-auto">
-      {/* Chat Messages Area */}
-      <div
-        ref={chatContainerRef}
-        className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
-      >
+    <div className="flex flex-col h-[calc(100vh-4rem)] p-4 bg-gray-900">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto space-y-4 pr-4 mb-4">
         <AnimatePresence>
           {!hasMessages && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col items-center justify-center h-full text-center py-12"
+              transition={{ duration: 0.3 }}
+              className="flex items-start space-x-2 justify-start"
             >
-              <motion.div
-                className="relative mb-8"
-                animate={{
-                  rotate: [0, 5, -5, 0],
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-              >
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6 rounded-3xl">
-                  <Bot className="h-12 w-12 text-white" />
-                </div>
-                <Sparkles className="h-6 w-6 text-yellow-400 absolute -top-2 -right-2" />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="max-w-2xl"
-              >
-                <h2 className="text-3xl font-bold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
-                  Welcome to QueryAmie!
-                </h2>
-                <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                  I'm your AI document assistant. Upload your documents and start asking questions to unlock insights,
-                  get summaries, and explore your content in new ways.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <div className="flex items-center space-x-2 text-purple-400">
-                    <FileText className="h-5 w-5" />
-                    <span className="text-sm">Upload documents</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-pink-400">
-                    <Bot className="h-5 w-5" />
-                    <span className="text-sm">Ask questions</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-yellow-400">
-                    <Sparkles className="h-5 w-5" />
-                    <span className="text-sm">Get insights</span>
-                  </div>
-                </div>
-              </motion.div>
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-5 h-5 text-gray-300" />
+              </div>
+              <div className="p-3 rounded-lg max-w-[70%] bg-gray-800 text-gray-200 break-words space-y-2">
+                <p>Welcome to <strong className="text-blue-400">QueryAmie</strong>! How can I assist you today?</p>
+                <p>Please upload a document to get started.</p>
+              </div>
             </motion.div>
           )}
 
           {chatMessages.map((msg, index) => (
             <motion.div
-              key={msg.id}
+              key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className={`flex items-start space-x-4 ${msg.sender_type === "user" ? "justify-end" : "justify-start"}`}
+              transition={{ duration: 0.3 }}
+              className={`flex items-start space-x-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              {msg.sender_type === "assistant" && (
-                <motion.div
-                  className="flex-shrink-0"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                </motion.div>
+              {msg.sender === 'QueryAmie' && (
+                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-gray-300" />
+                </div>
               )}
-
-              <motion.div
-                className={`max-w-[75%] rounded-2xl p-4 shadow-lg ${
-                  msg.sender_type === "user"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-                    : "backdrop-blur-md bg-white/10 border border-white/20 text-white"
-                }`}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <ReactMarkdown
-                  components={{
-                    p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
-                    ul: ({ children }) => <ul className="list-disc pl-4 mb-2 last:mb-0 space-y-1">{children}</ul>,
-                    ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 last:mb-0 space-y-1">{children}</ol>,
-                    code: ({ children }) => (
-                      <code className="bg-black/20 px-2 py-1 rounded text-sm font-mono">{children}</code>
-                    ),
-                    pre: ({ children }) => (
-                      <pre className="bg-black/30 p-3 rounded-lg overflow-x-auto text-sm font-mono border border-white/10">
-                        {children}
-                      </pre>
-                    ),
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
-              </motion.div>
-
-              {msg.sender_type === "user" && (
-                <motion.div
-                  className="flex-shrink-0"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-                    <User className="w-5 h-5 text-white" />
+              <div className={`p-3 rounded-lg max-w-[70%] break-words ${msg.sender === 'user' ? 'bg-gray-700 text-gray-100' : 'bg-gray-800 text-gray-200'} overflow-x-auto`}>
+                {msg.sender === 'user' ? (
+                  <span>{msg.message}</span>
+                ) : (
+                  <div className="prose-chat">
+                    <ReactMarkdown 
+                    components={{
+                      // Handle paragraphs
+                      p: ({children}) => (
+                        <p className="mb-2 last:mb-0 text-gray-200 leading-relaxed">
+                          {children}
+                        </p>
+                      ),
+                      // Handle bold text
+                      strong: ({children}) => (
+                        <strong className="font-bold text-gray-100">
+                          {children}
+                        </strong>
+                      ),
+                      // Handle italic text
+                      em: ({children}) => (
+                        <em className="italic text-gray-300">
+                          {children}
+                        </em>
+                      ),
+                      // Handle headings
+                      h1: ({children}) => (
+                        <h1 className="text-lg font-bold mb-2 text-gray-100 border-b border-gray-600 pb-1">
+                          {children}
+                        </h1>
+                      ),
+                      h2: ({children}) => (
+                        <h2 className="text-base font-bold mb-2 text-gray-100">
+                          {children}
+                        </h2>
+                      ),
+                      h3: ({children}) => (
+                        <h3 className="text-sm font-bold mb-1 text-gray-100">
+                          {children}
+                        </h3>
+                      ),
+                      // Handle unordered lists
+                      ul: ({children}) => (
+                        <ul className="list-disc list-inside mb-2 space-y-1 text-gray-200 ml-4">
+                          {children}
+                        </ul>
+                      ),
+                      // Handle ordered lists
+                      ol: ({children}) => (
+                        <ol className="list-decimal list-inside mb-2 space-y-1 text-gray-200 ml-4">
+                          {children}
+                        </ol>
+                      ),
+                      // Handle list items
+                      li: ({children}) => (
+                        <li className="text-gray-200 leading-relaxed">
+                          {children}
+                        </li>
+                      ),
+                      // Handle blockquotes
+                      blockquote: ({children}) => (
+                        <blockquote className="border-l-4 border-gray-600 pl-4 italic text-gray-300 my-2 bg-gray-800/30 py-2 rounded-r">
+                          {children}
+                        </blockquote>
+                      ),
+                      // Handle code blocks and inline code
+                      code: ({children, className, ...props}) => {
+                        const isInline = !className || !className.includes('language-');
+                        if (isInline) {
+                          return (
+                            <code className="bg-gray-700 text-gray-100 px-1 py-0.5 rounded text-sm font-mono border border-gray-600" {...props}>
+                              {children}
+                            </code>
+                          );
+                        } else {
+                          return (
+                            <pre className="bg-gray-900 text-gray-100 p-3 rounded-lg overflow-x-auto my-2 border border-gray-700">
+                              <code className="font-mono text-sm" {...props}>
+                                {children}
+                              </code>
+                            </pre>
+                          );
+                        }
+                      },
+                      // Handle links
+                      a: ({href, children}) => (
+                        <a 
+                          href={href} 
+                          className="text-blue-400 hover:text-blue-300 underline transition-colors" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          {children}
+                        </a>
+                      ),
+                    }}
+                    >
+                      {msg.message}
+                    </ReactMarkdown>
                   </div>
-                </motion.div>
+                )}
+              </div>
+              {msg.sender === 'user' && (
+                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                  <User className="w-5 h-5 text-gray-300" />
+                </div>
               )}
             </motion.div>
           ))}
@@ -265,16 +405,13 @@ export default function ChatWindow({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="flex items-start space-x-4 justify-start"
+              className="flex items-start space-x-2 justify-start"
             >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-5 h-5 text-gray-300" />
               </div>
-              <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-4 shadow-lg">
-                <div className="flex items-center space-x-2">
-                  <Loader className="w-5 h-5 animate-spin text-purple-400" />
-                  <span className="text-white">Thinking...</span>
-                </div>
+              <div className="p-3 rounded-lg max-w-[70%] bg-gray-800 text-gray-200 break-words">
+                <Loader className="w-5 h-5 animate-spin" />
               </div>
             </motion.div>
           )}
@@ -285,85 +422,57 @@ export default function ChatWindow({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="flex items-start space-x-4 justify-start"
+              className="flex items-start space-x-2 justify-start"
             >
-              <div className="w-10 h-10 rounded-2xl bg-red-500 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-5 h-5 text-gray-300" />
               </div>
-              <div className="max-w-[75%] backdrop-blur-md bg-red-500/10 border border-red-500/20 rounded-2xl p-4 shadow-lg">
-                <div className="text-red-400">
-                  <ReactMarkdown>{chatErrorMessage.content}</ReactMarkdown>
-                </div>
+              <div className="p-3 rounded-lg max-w-[70%] break-words bg-gray-800 text-red-500">
+                <span>{chatErrorMessage.message}</span>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      {/* Input Area */}
-      <div className="p-6 border-t border-white/20 backdrop-blur-md bg-white/5">
-        <div className="flex items-end space-x-4 max-w-4xl mx-auto">
-          <div className="flex-1 relative">
-            <Input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={
-                isSubmitSuccessful
-                  ? "Ask me anything about your documents..."
-                  : "Upload documents first to start chatting..."
-              }
-              onKeyPress={handleKeyPress}
-              disabled={!isSubmitSuccessful || !currentChatSessionId || isLoading}
-              className="bg-white/10 backdrop-blur-sm text-white border-white/20 focus:border-purple-400 focus:ring-purple-400/20 placeholder-gray-400 rounded-2xl h-12 pr-10" // Adjusted pr-12 to pr-10
-            />
-            {message && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute right-2 top-2 transform -translate-y-1/2"
-              >
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!isSubmitSuccessful || !currentChatSessionId || isLoading}
-                  size="icon"
-                  className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </motion.div>
-            )}
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="hidden md:inline-flex border-purple-400 text-purple-400 hover:bg-purple-400/10 hover:text-purple-300 backdrop-blur-sm"
-            onClick={isSmallScreen && isSidebarOpen ? onNewChat : toggleSidebar}
-          >
-            {isSmallScreen && isSidebarOpen ? (
-              <>
-                <PlusCircle className="h-4 w-4 mr-2" />
-                New Chat
-              </>
-            ) : (
-              <>
-                <Paperclip className="h-4 w-4 mr-2" />
-                Files
-              </>
-            )}
-          </Button>
-        </div>
-
-        {!isSubmitSuccessful && (
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center text-gray-400 text-sm mt-3"
-          >
-            Upload and submit documents to start chatting
-          </motion.p>
-        )}
+      <div className="flex items-center space-x-2">
+        <Input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type your message..."
+          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+          disabled={!isSubmitSuccessful}
+          className="flex-1 bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-gray-600 focus:border-gray-600"
+        />
+        <VoiceButton
+          onVoiceMessage={handleVoiceMessage}
+          disabled={!isSubmitSuccessful}
+          chatId={currentChatSessionId}
+        />
+        <Button
+          onClick={handleSendMessage}
+          disabled={!isSubmitSuccessful}
+          className="bg-gray-700 hover:bg-gray-600 text-gray-100">
+          <Send className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          onClick={
+            isSmallScreen
+              ? isSidebarOpen
+                ? onNewChat // Action when sidebar is open on a small screen
+                : toggleSidebar // Action when sidebar is closed on a small screen
+              : onNewChat // Default action for larger screens
+          }
+          className="border-gray-700 text-gray-800 hover:bg-gray-800 hover:text-gray-100"
+        >
+          {isSmallScreen
+            ? isSidebarOpen 
+              ? <PlusCircle className="h-4 w-4" /> 
+              : <Paperclip className="h-4 w-4" />
+            : <PlusCircle className="h-4 w-4" />
+          }
+        </Button>
       </div>
     </div>
-  )
+  );
 }

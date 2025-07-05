@@ -170,7 +170,7 @@ export async function translatePage(targetLang: string): Promise<void> {
     const response = await axios.post<TranslationResponse>("http://localhost:8000/translate", payload)
 
     if (response.data.success && response.data.translations) {
-      Object.entries(response.data.translations).forEach(([id, translatedText]) => {
+      Object.entries(response.data.translations).forEach(([id, translatedText]: [string, string]) => {
         const el = document.querySelector(`[data-trans-id="${id}"]`)
         if (!el || !translatedText) return
 
