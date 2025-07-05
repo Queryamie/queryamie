@@ -116,13 +116,15 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
         } 
       });
       setupAudioAnalysis(stream);
-      const recorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
-          ? 'audio/webm;codecs=opus' 
-          : MediaRecorder.isTypeSupported('audio/wav')
-          ? 'audio/wav'
-          : 'audio/mp4'
-      });
+      const preferredMimeType = 'audio/mp4';
+      const fallbackMimeType = 'audio/webm;codecs=opus';
+      const mimeType = MediaRecorder.isTypeSupported(preferredMimeType) 
+        ? preferredMimeType 
+        : fallbackMimeType;
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        throw new Error(`Neither ${preferredMimeType} nor ${fallbackMimeType} is supported by this browser`);
+      }
+      const recorder = new MediaRecorder(stream, { mimeType });
       audioChunks.current = [];
       setRecordingTime(0);
       recorder.ondataavailable = (event) => {
@@ -158,8 +160,9 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
           return newTime;
         });
       }, 1000);
-    } catch (error) {
-      setError('Microphone access denied or not available');
+    } catch (error: any) {
+      console.error('Recording error:', error); // Log full error details
+      setError(error.message || 'Microphone access denied or not available');
       setRecordingState('error');
     }
   };
@@ -180,7 +183,10 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
       setRecordingState('processing');
       setError(null);
       const formData = new FormData();
-      formData.append('file', audioBlob, 'voice-message.webm');
+      const fileExtension = audioBlob.type.includes('audio/mp4') || audioBlob.type.includes('audio/m4a')
+        ? 'voice-message.m4a'
+        : 'voice-message.webm';
+      formData.append('file', audioBlob, fileExtension);
       const token = localStorage.getItem('access_token') || sessionStorage.getItem('token');
       if (!token) {
         throw new Error('Authentication required');
