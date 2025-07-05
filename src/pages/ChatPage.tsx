@@ -48,7 +48,7 @@ interface UploadedFile {
 // Custom markdown components for chat bubbles
 const markdownComponents = {
   p: ({ children }: any) => (
-    <p className="mb-2 last:mb-0 leading-relaxed text-gray-200">{children}</p>
+    <p className="mb-2 last:mb-0 leading-relaxed text-gray-200 text-sm sm:text-base">{children}</p>
   ),
   strong: ({ children }: any) => <strong className="font-semibold text-gray-100">{children}</strong>,
   em: ({ children }: any) => <em className="italic text-gray-300">{children}</em>,
@@ -64,14 +64,14 @@ const markdownComponents = {
     const isInline = !className || !className.includes('language-');
     if (isInline) {
       return (
-        <code className="bg-dark-700 text-gray-100 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+        <code className="bg-dark-700 text-gray-100 px-1 py-0.5 rounded text-xs sm:text-sm font-mono" {...props}>
           {children}
         </code>
       );
     }
     return (
       <pre className="bg-dark-800 text-gray-100 p-3 rounded-lg overflow-x-auto my-2 border border-dark-600">
-        <code className="font-mono text-sm" {...props}>{children}</code>
+        <code className="font-mono text-xs sm:text-sm" {...props}>{children}</code>
       </pre>
     );
   },
@@ -658,7 +658,7 @@ const ChatPage: React.FC = () => {
                       placeholder={uploadedFiles.length === 0 ? 'Upload a document to start chatting' : 'Ask anything about your documents...'}
                       minRows={1}
                       maxRows={7}
-                      className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white placeholder-gray-400 px-3 py-2 text-lg"
+                      className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white text-sm sm:text-lg placeholder-gray-400 placeholder:text-sm sm:placeholder:text-base px-3 py-2"
                       onKeyDown={e => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -727,13 +727,13 @@ const ChatPage: React.FC = () => {
                       )}
                       <div className="flex-1">
                         {message.sender_type === 'ai' ? (
-                          <div className="prose prose-invert max-w-none break-words break-all">
+                          <div className="prose prose-invert max-w-none break-words">
                             <ReactMarkdown components={markdownComponents}>
                               {message.content}
                             </ReactMarkdown>
                           </div>
                         ) : (
-                          <p className="whitespace-pre-wrap leading-relaxed break-words break-all">{message.content}</p>
+                          <p className="whitespace-pre-wrap leading-relaxed break-words text-sm sm:text-base">{message.content}</p>
                         )}
                         {message.sender_type === 'ai' && message.sources && message.sources.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-gray-600/50">
@@ -790,7 +790,7 @@ const ChatPage: React.FC = () => {
                     placeholder="Ask anything about your documents..."
                     minRows={1}
                     maxRows={7}
-                    className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white placeholder-gray-400 px-3 py-2 text-lg"
+                    className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white text-sm sm:text-lg placeholder-gray-400 placeholder:text-sm sm:placeholder:text-base px-3 py-2"
                     onKeyDown={e => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
