@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Upload, Send, Plus, Bot, Loader2, Menu, X, Sparkles, MessageSquare, FileText
+  Upload, Send, Plus, Loader2, Menu, X, Sparkles, MessageSquare, FileText, Square
 } from 'lucide-react';
 import VoiceButton from '../components/VoiceButton';
 import { Button } from '../components/ui/button';
@@ -11,6 +11,7 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import Sidebar from '../components/Sidebar';
 import TextareaAutosize from 'react-textarea-autosize';
+import logo from '../assets/logo.png';
 
 // Types
 interface ChatSession {
@@ -111,11 +112,13 @@ const ChatPage: React.FC = () => {
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isUploading, setIsUploading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
+  const streamingRef = useRef<boolean>(false);
   
   // Get auth token
   const getAuthToken = () => localStorage.getItem('access_token');
@@ -259,8 +262,77 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // Send message
+  // Frontend streaming simulation
+  const simulateTyping = async (text: string, messageId: string, sources?: string[], confidence?: number, language?: string) => {
+    
+    // Split into characters for more realistic typing effect
+    const chars = text.split('');
+    let currentText = '';
+    
+    for (let i = 0; i < chars.length; i++) {
+      // Check if streaming was cancelled using ref
+      if (!streamingRef.current) {
+        // If cancelled, show the full text immediately
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === messageId 
+              ? { 
+                  ...msg, 
+                  content: text,
+                  sources: sources && sources.length > 0 ? sources : undefined,
+                  confidence,
+                  language
+                }
+              : msg
+          )
+        );
+        return;
+      }
+      
+      currentText += chars[i];
+      
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, content: currentText }
+            : msg
+        )
+      );
+      
+      // Faster typing for spaces and punctuation, slower for letters
+      const char = chars[i];
+      let delay = 10; // Base delay (reduced from 20)
+      
+      if (char === ' ') {
+        delay = 5; // Fast for spaces (reduced from 10)
+      } else if (char === '.' || char === '!' || char === '?') {
+        delay = 50; // Pause at sentence endings (reduced from 100)
+      } else if (char === ',') {
+        delay = 25; // Short pause at commas (reduced from 50)
+      } else {
+        delay = Math.random() * 20 + 10; // 10-30ms for regular characters (reduced from 20-60ms)
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    // Final update with metadata (ensure we have the complete text)
+    setMessages(prev => 
+      prev.map(msg => 
+        msg.id === messageId 
+          ? { 
+              ...msg, 
+              content: text,
+              sources: sources && sources.length > 0 ? sources : undefined,
+              confidence,
+              language
+            }
+          : msg
+      )
+    );
+  };
 
+  // Send message with frontend streaming
   const sendMessage = async () => {
     if (!currentMessage.trim()) return;
     let chatIdToUse = currentChatId;
@@ -278,6 +350,7 @@ const ChatPage: React.FC = () => {
         return;
       }
     }
+    
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       sender_type: 'user',
@@ -285,40 +358,69 @@ const ChatPage: React.FC = () => {
       timestamp: new Date().toISOString(),
     };
     setMessages(prev => [...prev, userMessage]);
+    
+    // Create AI message placeholder for streaming
+    const aiMessageId = (Date.now() + 1).toString();
+    const aiMessage: ChatMessage = {
+      id: aiMessageId,
+      sender_type: 'ai',
+      content: '',
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, aiMessage]);
+    
     const messageToSend = currentMessage;
     setCurrentMessage('');
     setIsLoading(true);
+    
     try {
       const response = await apiCall(`/chat/${chatIdToUse}/message`, {
         method: 'POST',
         data: {
           content: messageToSend,
-          stream: false,
+          stream: false, // Disable backend streaming
         },
       });
+
       if (response) {
-        const aiMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          sender_type: 'ai',
-          content: response.data.answer,
-          timestamp: new Date().toISOString(),
-          sources: response.data.sources,
-          confidence: response.data.confidence,
-          language: response.data.language,
-        };
-        setMessages(prev => [...prev, aiMessage]);
-        await loadChatSessions(); // <-- Ensure sidebar updates after sending first message
+        setIsStreaming(true);
+        streamingRef.current = true;
+        setIsLoading(false); // Stop loading since we got the response
+        
+        // Simulate typing effect with the received response
+        await simulateTyping(
+          response.data.answer,
+          aiMessageId,
+          response.data.sources,
+          response.data.confidence,
+          response.data.language
+        );
+        
+        setIsStreaming(false);
+        streamingRef.current = false;
+        await loadChatSessions(); // Ensure sidebar updates after sending first message
       }
     } catch (error: any) {
       console.error('Error sending message:', error);
       const errorMessage = error.response?.data?.detail || 'Failed to send message. Please try again.';
       toast.error(errorMessage);
-    } finally {
+      
+      // Remove the failed AI message
+      setMessages(prev => prev.filter(msg => msg.id !== aiMessageId));
       setIsLoading(false);
+      setIsStreaming(false);
+      streamingRef.current = false;
     }
   };
 
-  // Voice message handler
+  // Stop streaming
+  const stopStreaming = () => {
+    setIsStreaming(false);
+    streamingRef.current = false;
+    setIsLoading(false);
+  };
+
+  // Voice message handler with frontend streaming
   const handleVoiceMessage = async (voiceText: string) => {
     if (!voiceText.trim() || !currentChatId) return;
 
@@ -330,6 +432,17 @@ const ChatPage: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    
+    // Create AI message placeholder for streaming
+    const aiMessageId = (Date.now() + 1).toString();
+    const aiMessage: ChatMessage = {
+      id: aiMessageId,
+      sender_type: 'ai',
+      content: '',
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, aiMessage]);
+    
     setIsLoading(true);
 
     try {
@@ -337,28 +450,37 @@ const ChatPage: React.FC = () => {
         method: 'POST',
         data: {
           content: voiceText,
-          stream: false,
+          stream: false, // Disable backend streaming
         },
       });
 
       if (response) {
-        const aiMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          sender_type: 'ai',
-          content: response.data.answer,
-          timestamp: new Date().toISOString(),
-          sources: response.data.sources,
-          confidence: response.data.confidence,
-          language: response.data.language,
-        };
-        setMessages(prev => [...prev, aiMessage]);
+        setIsStreaming(true);
+        streamingRef.current = true;
+        setIsLoading(false); // Stop loading since we got the response
+        
+        // Simulate typing effect with the received response
+        await simulateTyping(
+          response.data.answer,
+          aiMessageId,
+          response.data.sources,
+          response.data.confidence,
+          response.data.language
+        );
+        
+        setIsStreaming(false);
+        streamingRef.current = false;
       }
     } catch (error: any) {
       console.error('Error sending voice message:', error);
       const errorMessage = error.response?.data?.detail || 'Failed to send voice message. Please try again.';
       toast.error(errorMessage);
-    } finally {
+      
+      // Remove the failed AI message
+      setMessages(prev => prev.filter(msg => msg.id !== aiMessageId));
       setIsLoading(false);
+      setIsStreaming(false);
+      streamingRef.current = false;
     }
   };
 
@@ -684,13 +806,22 @@ const ChatPage: React.FC = () => {
                           disabled={isLoading || uploadedFiles.length === 0}
                           chatId={currentChatId || ''}
                         />
-                        <Button
-                          onClick={sendMessage}
-                          disabled={uploadedFiles.length === 0 || !currentMessage.trim() || isLoading}
-                          className="bg-primary-600 hover:bg-primary-700 text-white rounded-xl px-4 py-2"
-                        >
-                          <Send className="h-5 w-5" />
-                        </Button>
+                        {isStreaming ? (
+                          <Button
+                            onClick={stopStreaming}
+                            className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-4 py-2"
+                          >
+                            <Square className="h-5 w-5" />
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={sendMessage}
+                            disabled={uploadedFiles.length === 0 || !currentMessage.trim() || isLoading}
+                            className="bg-primary-600 hover:bg-primary-700 text-white rounded-xl px-4 py-2"
+                          >
+                            <Send className="h-5 w-5" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -721,6 +852,13 @@ const ChatPage: React.FC = () => {
                             <ReactMarkdown components={markdownComponents}>
                               {message.content}
                             </ReactMarkdown>
+                            {isStreaming && message.content && message.id === messages[messages.length - 1]?.id && (
+                              <img 
+                                src={logo} 
+                                alt="Logo"
+                                className="inline-block w-4 h-4 ml-1 animate-pulse opacity-70"
+                              />
+                            )}
                           </div>
                         ) : (
                           <p className="whitespace-pre-wrap leading-relaxed break-words text-sm sm:text-base">{message.content}</p>
@@ -752,13 +890,19 @@ const ChatPage: React.FC = () => {
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-dark-700/80 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg flex items-center space-x-3">
+                  <div className="rounded-2xl px-4 py-3 flex items-center space-x-3">
                     <div className="bg-primary-500/20 p-2 rounded-full">
-                      <Bot className="h-5 w-5 text-primary-400" />
+                      <img 
+                        src={logo} 
+                        alt="Logo"
+                        className="h-5 w-5 opacity-70"
+                      />
                     </div>
                     <div className="flex items-center space-x-2">
                       <Loader2 className="h-5 w-5 animate-spin text-primary-400" />
-                      <span className="text-gray-300">QueryAmie is thinking...</span>
+                      <span className="text-gray-300">
+                        {isStreaming ? 'QueryAmie is responding...' : 'QueryAmie is thinking...'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -806,13 +950,22 @@ const ChatPage: React.FC = () => {
                         disabled={isLoading || uploadedFiles.length === 0}
                         chatId={currentChatId || ''}
                       />
-                      <Button
-                        onClick={sendMessage}
-                        disabled={uploadedFiles.length === 0 || !currentMessage.trim() || isLoading}
-                        className="bg-primary-600 hover:bg-primary-700 text-white rounded-xl px-4 py-2"
-                      >
-                        <Send className="h-5 w-5" />
-                      </Button>
+                      {isStreaming ? (
+                        <Button
+                          onClick={stopStreaming}
+                          className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-4 py-2"
+                        >
+                          <Square className="h-5 w-5" />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={sendMessage}
+                          disabled={uploadedFiles.length === 0 || !currentMessage.trim() || isLoading}
+                          className="bg-primary-600 hover:bg-primary-700 text-white rounded-xl px-4 py-2"
+                        >
+                          <Send className="h-5 w-5" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
