@@ -4,9 +4,6 @@ import { useInView } from 'react-intersection-observer';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { 
   PlayIcon, 
-  DocumentTextIcon, 
-  MicrophoneIcon, 
-  LanguageIcon,
   SparklesIcon,
   ArrowRightIcon 
 } from '@heroicons/react/24/outline';
@@ -46,7 +43,7 @@ const ChatInterface: React.FC = () => {
   const currentAnswer = qaSequence[currentQA]?.answer || "";
   const currentQuestion = qaSequence[currentQA]?.question || "";
   
-  const { displayText, isComplete, isTyping } = useTypewriter(
+  const { displayText, isTyping } = useTypewriter(
     currentAnswer,
     25, // slightly slower typing speed
     showAiResponse ? 800 : 0

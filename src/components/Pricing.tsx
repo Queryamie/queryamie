@@ -7,7 +7,6 @@ import {
   StarIcon,
   SparklesIcon,
   EnvelopeIcon,
-  PhoneIcon,
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 import { Zap, Crown, Rocket, Mail, MessageSquare } from 'lucide-react';
@@ -151,7 +150,7 @@ const Pricing: React.FC = () => {
             variants={containerVariants}
             className="grid md:grid-cols-3 gap-8 mb-16"
           >
-            {plans.map((plan, index) => (
+            {plans.map((plan) => (
               <motion.div
                 key={plan.name}
                 variants={itemVariants}

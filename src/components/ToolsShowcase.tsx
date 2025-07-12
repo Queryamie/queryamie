@@ -3,12 +3,6 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 import { 
-  DocumentTextIcon,
-  MicrophoneIcon,
-  LanguageIcon,
-  PresentationChartBarIcon,
-  DocumentDuplicateIcon,
-  ChatBubbleLeftRightIcon,
   SparklesIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
@@ -208,7 +202,7 @@ const ToolsShowcase: React.FC = () => {
             variants={containerVariants}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16"
           >
-            {tools.map((tool, index) => (
+            {tools.map((tool) => (
               <motion.div
                 key={tool.title}
                 variants={itemVariants}

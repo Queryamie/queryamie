@@ -4,14 +4,12 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { 
   CalendarDaysIcon, 
-  ClockIcon,
   UserIcon,
   BuildingOfficeIcon,
-  PhoneIcon,
   VideoCameraIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { Calendar, Clock, Users, Video, Phone, MessageSquare } from 'lucide-react';
+import { Calendar, Clock, Users, Video, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
@@ -65,7 +63,7 @@ const ScheduleDemoPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/demo/book`, formData);
+      await axios.post(`${import.meta.env.VITE_BACKEND_API}/demo/book`, formData);
 
       toast.success('Demo booked successfully! We will contact you shortly.');
 

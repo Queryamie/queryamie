@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { FileText, Users, Target, Zap, Globe, Heart } from 'lucide-react';
+import { Users, Target, Zap, Globe, Heart } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
   const containerVariants = {
@@ -139,7 +139,7 @@ const AboutPage: React.FC = () => {
                   title: "Human-Centered",
                   description: "Technology should feel natural and intuitive. We prioritize user experience and human connection in everything we build."
                 }
-              ].map((value, index) => (
+              ].map((value) => (
                 <motion.div
                   key={value.title}
                   variants={itemVariants}

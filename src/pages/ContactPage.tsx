@@ -3,14 +3,12 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { 
-  EnvelopeIcon, 
-  PhoneIcon, 
   PaperAirplaneIcon,
   MapPinIcon,
   ClockIcon,
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
-import { Mail, Phone, MessageSquare, Send } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
@@ -57,7 +55,7 @@ const ContactPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/contact/feedback`, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_API}/contact/feedback`, {
         name: formData.name.trim(),
         email: formData.email.trim(),
         message: formData.message.trim()

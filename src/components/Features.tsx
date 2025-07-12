@@ -2,13 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { 
-  MicrophoneIcon,
-  LanguageIcon,
-  DocumentTextIcon,
-  BoltIcon,
-  CloudIcon,
   ShieldCheckIcon,
-  ChatBubbleLeftRightIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { Mic, Languages, FileText, Zap, MessageSquare, Brain, Headphones, Globe } from 'lucide-react';
@@ -152,7 +146,7 @@ const Features: React.FC = () => {
             <div id="voice" className="absolute -top-20"></div>
             {/* Translation Section Anchor */}
             <div id="translation" className="absolute -top-20"></div>
-            {mainFeatures.map((feature, index) => (
+            {mainFeatures.map((feature) => (
               <motion.div
                 key={feature.title}
                 variants={cardVariants}
@@ -189,7 +183,7 @@ const Features: React.FC = () => {
               Everything You Need for Document Intelligence
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {additionalFeatures.map((feature, index) => (
+              {additionalFeatures.map((feature) => (
                 <motion.div
                   key={feature.title}
                   variants={cardVariants}

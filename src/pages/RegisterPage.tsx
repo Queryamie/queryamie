@@ -10,7 +10,7 @@ import {
   ArrowRightIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { UserPlus, Shield, Zap, Check } from 'lucide-react';
+import { UserPlus, Check } from 'lucide-react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -66,7 +66,7 @@ const RegisterPage: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}/signup`, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_API}/signup`, {
         username: formData.username,
         full_name: formData.fullName,
         email: formData.email,
