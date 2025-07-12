@@ -1,6 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import knust from '@/assets/knust.png';
+import ug from '@/assets/ug.png';
+import ucc from '@/assets/ucc.png';
+import uew from '@/assets/uew.png';
+import ashesi from '@/assets/ashesi.png';
+import uds from '@/assets/uds.png';
+import uhas from '@/assets/uhas.png';
+import upsa from '@/assets/upsa.png';
 
 const TrustedBy: React.FC = () => {
   const [ref, inView] = useInView({
@@ -10,14 +18,14 @@ const TrustedBy: React.FC = () => {
 
   // University logos data with imported images
   const companies = [
-    { name: 'KNUST', logo: '/src/assets/knust.png' },
-    { name: 'UG', logo: '/src/assets/ug.png' },
-    { name: 'UCC', logo: '/src/assets/ucc.png' },
-    { name: 'UEW', logo: '/src/assets/uew.png' },
-    { name: 'Ashesi', logo: '/src/assets/ashesi.png' },
-    { name: 'UDS', logo: '/src/assets/uds.png' },
-    { name: 'UHAS', logo: '/src/assets/uhas.png' },
-    { name: 'UPSA', logo: '/src/assets/upsa.png' },
+    { name: 'KNUST', logo: knust },
+    { name: 'UG', logo: ug },
+    { name: 'UCC', logo: ucc },
+    { name: 'UEW', logo: uew },
+    { name: 'Ashesi', logo: ashesi },
+    { name: 'UDS', logo: uds },
+    { name: 'UHAS', logo: uhas },
+    { name: 'UPSA', logo: upsa },
   ];
 
   const containerVariants = {
