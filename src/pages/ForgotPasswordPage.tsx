@@ -7,7 +7,7 @@ import {
   KeyIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
-import { Mail, Shield, Clock, ArrowLeft } from 'lucide-react';
+import { Mail, Shield, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
@@ -57,7 +57,6 @@ const ForgotPasswordPage: React.FC = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      console.log('Password reset email resent to:', email);
     }, 1500);
   };
 

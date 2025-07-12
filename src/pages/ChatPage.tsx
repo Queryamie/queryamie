@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Upload, Send, Plus, Bot, User, Loader2, Menu, X, Sparkles, MessageSquare, FileText
+  Upload, Send, Plus, Bot, Loader2, Menu, X, Sparkles, MessageSquare, FileText
 } from 'lucide-react';
 import VoiceButton from '../components/VoiceButton';
 import { Button } from '../components/ui/button';
@@ -153,7 +153,6 @@ const ChatPage: React.FC = () => {
   const loadChatSessions = async () => {
     try {
       const response = await apiCall('/chat/sessions');
-      console.log('response for chat sessions: ', response?.data)
       if (response) {
         const sessionsWithMessages = response.data.filter((session: ChatSession) => 
           session.analytics.message_count > 0
@@ -709,23 +708,13 @@ const ChatPage: React.FC = () => {
                   className={`flex ${message.sender_type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-3xl rounded-2xl px-4 py-3 shadow-lg ${
+                    className={`max-w-3xl rounded-2xl px-4 py-3 ${
                       message.sender_type === 'user'
-                        ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white'
-                        : 'bg-dark-700/80 backdrop-blur-sm border border-dark-600/50 text-gray-100'
+                        ? 'bg-dark-700/80 backdrop-blur-sm border border-dark-600/50 text-gray-100 shadow-lg'
+                        : ''
                     }`}
                   >
                     <div className="flex items-start space-x-3">
-                      {message.sender_type === 'ai' && (
-                        <div className="bg-primary-500/20 p-2 rounded-full">
-                          <Bot className="h-5 w-5 text-primary-400" />
-                        </div>
-                      )}
-                      {message.sender_type === 'user' && (
-                        <div className="bg-white/20 p-2 rounded-full">
-                          <User className="h-5 w-5 text-white" />
-                        </div>
-                      )}
                       <div className="flex-1">
                         {message.sender_type === 'ai' ? (
                           <div className="prose prose-invert max-w-none break-words">

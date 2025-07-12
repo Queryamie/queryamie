@@ -2,6 +2,7 @@ import React, { useState, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Plus, Edit2, Trash2, Languages, X, Menu, Upload, FileText, LogOut, Check, X as XIcon } from 'lucide-react';
 import { Button } from './ui/button';
+import logo from '../assets/logo.png';
 
 // Tooltip component (fix typing)
 const Tooltip: React.FC<{ label: string; children: ReactNode }> = ({ label, children }) => (
@@ -124,9 +125,7 @@ const Sidebar: React.FC<SidebarProps & {
           
           {isOpen && (
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">Q</span>
-              </div>
+              <img src={logo} alt="QueryAmie Logo" className="w-8 h-8" />
               <span className="text-lg font-semibold text-white">QueryAmie</span>
             </div>
           )}

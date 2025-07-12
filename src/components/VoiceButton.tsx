@@ -19,7 +19,7 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
 }) => {
   const [recordingState, setRecordingState] = useState<RecordingState>('idle');
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  // Removed unused audioBlob state
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [permission, setPermission] = useState<PermissionState | null>(null);
@@ -136,7 +136,7 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
         const audioBlob = new Blob(audioChunks.current, { 
           type: recorder.mimeType 
         });
-        setAudioBlob(audioBlob);
+        // Removed setAudioBlob(audioBlob);
         stream.getTracks().forEach(track => track.stop());
         if (animationFrame.current) {
           cancelAnimationFrame(animationFrame.current);
@@ -223,7 +223,7 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
     } finally {
       setRecordingState('idle');
       setRecordingTime(0);
-      setAudioBlob(null);
+      // Removed setAudioBlob(null);
     }
   };
 

@@ -33,17 +33,12 @@ interface Message {
 }
 
 
-export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, isNewChat, setIsNewChat, isContinuousChat, setIsContinuousChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
+export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSidebar, onNewChat, chatMessages, setChatMessages, chatErrorMessage, setChatErrorMessage, setIsNewChat, setIsContinuousChat, chatHistoryMessages, currentChatSessionId, setCurrentChatSessionId}: ChatWindowProps) {
   const [message, setMessage] = useState("");
-  const [firstResponse, setFirstResponse] = useState("");
-  const [isFirstResponse, setIsFirstResponse] = useState(true);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
   const [isLoading, setIsLoading] = useState(false)
   const hasMessages = chatMessages.length > 0 || chatErrorMessage;
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  // Debug logging
-  console.log('ChatWindow render - currentChatSessionId:', currentChatSessionId, 'isSubmitSuccessful:', isSubmitSuccessful);
 
   // Effect to listen for window resize and update isSmallScreen
   useEffect(() => {
@@ -90,33 +85,6 @@ export default function ChatWindow({ isSubmitSuccessful, isSidebarOpen, toggleSi
         addMessagesToChat(chatHistoryMessages);
     }
   }, [chatHistoryMessages]);
-
-
-
-// Function to start a new chat session using enhanced MongoDB system
-function startNewChat() {
-  const token = sessionStorage.getItem("token");
-  
-  if (token) {
-    axios.post(`${import.meta.env.VITE_BACKEND_API}/chat/start`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then((response: any) => {
-        const data = response.data;
-        setCurrentChatSessionId(data.chat_id);  // Setting session ID
-        console.log("New chat session started:", data.chat_id);
-      })
-      .catch((error: any) => {
-        console.error("Error starting new chat:", error);
-        setChatErrorMessage({ sender: 'error', message: "Failed to start a new chat. Please try again." });
-      });
-  } else {
-    console.error("Authentication token needed");
-  }
-}
-
 
 
   const handleSendMessage = async () => {

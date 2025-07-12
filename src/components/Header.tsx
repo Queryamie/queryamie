@@ -26,7 +26,6 @@ export default function Header({ isSidebarOpen, toggleSidebar, onNewChat }: Head
     sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("chat_id");
     navigate("/");
-    console.log("Logged out");
   };
 
   return (

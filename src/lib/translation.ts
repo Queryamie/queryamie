@@ -167,7 +167,7 @@ export async function translatePage(targetLang: string): Promise<void> {
       context: "Web page content translation",
     }
 
-    const response = await axios.post<TranslationResponse>("http://localhost:8000/translate", payload)
+    const response = await axios.post<TranslationResponse>(`${import.meta.env.VITE_BACKEND_API}/translate`, payload)
 
     if (response.data.success && response.data.translations) {
       Object.entries(response.data.translations).forEach(([id, translatedText]: [string, string]) => {
