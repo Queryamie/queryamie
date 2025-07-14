@@ -236,28 +236,30 @@ const LiveDemo: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5 }}
                         >
-                          <div className="bg-dark-600 text-gray-200 px-4 py-3 rounded-lg max-w-md">
+                          <div className="bg-dark-600 text-gray-200 px-4 py-3 rounded-lg w-full max-w-md">
                             <div className="flex items-center space-x-2 mb-2">
-                              <MessageSquare className="w-4 h-4 text-accent-400" />
+                              <MessageSquare className="w-4 h-4 text-accent-400 flex-shrink-0" />
                               <span className="text-xs text-accent-400">QueryAmie</span>
                               {index === currentQA && isTyping && (
                                 <motion.div
-                                  className="w-1.5 h-1.5 bg-accent-400 rounded-full"
+                                  className="w-1.5 h-1.5 bg-accent-400 rounded-full flex-shrink-0"
                                   animate={{ opacity: [1, 0] }}
                                   transition={{ duration: 0.5, repeat: Infinity }}
                                 />
                               )}
                             </div>
-                            <p className="text-sm leading-relaxed">
-                              {index === currentQA ? displayText : qa.answer}
-                              {index === currentQA && isTyping && (
-                                <motion.span
-                                  className="inline-block w-0.5 h-4 bg-accent-400 ml-0.5"
-                                  animate={{ opacity: [1, 0] }}
-                                  transition={{ duration: 0.5, repeat: Infinity }}
-                                />
-                              )}
-                            </p>
+                            <div className="text-sm leading-[1.4] min-h-[60px] overflow-hidden">
+                              <p className="whitespace-pre-wrap break-words m-0 p-0">
+                                {index === currentQA ? displayText : qa.answer}
+                                {index === currentQA && isTyping && (
+                                  <motion.span
+                                    className="inline-block w-0.5 h-[14px] bg-accent-400 ml-0.5 align-middle"
+                                    animate={{ opacity: [1, 0] }}
+                                    transition={{ duration: 0.5, repeat: Infinity }}
+                                  />
+                                )}
+                              </p>
+                            </div>
                           </div>
                         </motion.div>
                       )}

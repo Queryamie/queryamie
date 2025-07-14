@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  FileText, 
   Twitter, 
   Linkedin, 
   Mail, 
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import logo from '../assets/logo.png';
 
 const Footer: React.FC = () => {
   // Newsletter subscription state
@@ -123,10 +123,8 @@ const Footer: React.FC = () => {
             {/* Brand Section */}
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <div className="flex items-center space-x-2 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
+              <img src={logo} alt="Logo" className="h-12 w-auto" />
+                <span className="text-2xl font-bold ">
                   QueryAmie
                 </span>
               </div>

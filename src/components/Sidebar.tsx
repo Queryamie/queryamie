@@ -90,7 +90,7 @@ const Sidebar: React.FC<SidebarProps & {
   
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const sidebarWidth = isOpen ? 'w-72 md:w-72' : isMobile ? 'w-0' : 'w-16';
-  const sidebarBase = `fixed z-40 inset-y-0 left-0 bg-dark-900/95 backdrop-blur-md border-r border-dark-700/50 flex flex-col transition-all duration-300 ${sidebarWidth}`;
+  const sidebarBase = `fixed z-40 inset-y-0 left-0 bg-dark-900/95 backdrop-blur-md border-r border-dark-700/50 flex flex-col transition-all duration-150 ease-out ${sidebarWidth}`;
   const iconSize = isOpen ? 'h-5 w-5' : 'h-6 w-6';
 
   return (
@@ -98,15 +98,13 @@ const Sidebar: React.FC<SidebarProps & {
       {/* Sidebar overlay for mobile */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/60 md:hidden"
+          className="fixed inset-0 z-30 bg-black/60 md:hidden transition-opacity duration-150"
           onClick={onToggle}
         />
       )}
       
       {/* Sidebar */}
-      <motion.nav
-        initial={false}
-        animate={{ width: isOpen ? 288 : isMobile ? 0 : 64 }}
+      <nav
         className={sidebarBase}
         style={{ boxShadow: isOpen ? '0 0 32px 0 rgba(0,0,0,0.25)' : undefined }}
       >
@@ -390,7 +388,7 @@ const Sidebar: React.FC<SidebarProps & {
                     </div>
                     {/* Action icons always at right end */}
                     {editingChatId !== session.chat_id && (
-                      <div className="flex items-center space-x-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center space-x-1 flex-shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         {pendingDelete === session.chat_id ? (
                           <>
                             <Button
@@ -470,7 +468,7 @@ const Sidebar: React.FC<SidebarProps & {
             </Tooltip>
           )}
         </div>
-      </motion.nav>
+      </nav>
     </>
   );
 };

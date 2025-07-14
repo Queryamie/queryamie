@@ -780,7 +780,7 @@ const ChatPage: React.FC = () => {
                       placeholder={uploadedFiles.length === 0 ? 'Upload a document to start chatting' : 'Ask anything about your documents...'}
                       minRows={1}
                       maxRows={7}
-                      className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white text-sm sm:text-lg placeholder-gray-400 placeholder:text-sm sm:placeholder:text-base px-3 py-2"
+                      className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white text-base font-normal placeholder-gray-400 placeholder:text-base placeholder:font-normal px-3 py-2"
                       onKeyDown={e => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -924,7 +924,7 @@ const ChatPage: React.FC = () => {
                     placeholder="Ask anything about your documents..."
                     minRows={1}
                     maxRows={7}
-                    className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white text-sm sm:text-lg placeholder-gray-400 placeholder:text-sm sm:placeholder:text-base px-3 py-2"
+                    className="w-full bg-transparent outline-none focus:outline-none border-none focus:border-none shadow-none focus:shadow-none ring-0 focus:ring-0 resize-none text-white text-base font-normal placeholder-gray-400 placeholder:text-base placeholder:font-normal px-3 py-2"
                     onKeyDown={e => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();

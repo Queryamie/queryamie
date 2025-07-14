@@ -104,7 +104,7 @@ const ChatInterface: React.FC = () => {
   return (
     <div className="border-t border-dark-600 p-4 overflow-hidden">
       {/* Fixed height container to prevent layout shifts */}
-      <div className="relative h-[280px] flex flex-col justify-center">
+      <div className="relative h-[320px] flex flex-col justify-center">
         {/* Stable container for messages with absolute positioning */}
         <div className="relative space-y-3">
           {/* User Message with stable positioning */}
@@ -170,29 +170,32 @@ const ChatInterface: React.FC = () => {
                 initial={{ opacity: 0, x: -20, scale: 0.9 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
+                className="w-full max-w-xs"
               >
-                <div className="bg-dark-600 text-gray-200 px-4 py-2 rounded-lg max-w-xs">
+                <div className="bg-dark-600 text-gray-200 px-4 py-2 rounded-lg w-full">
                   <div className="flex items-center space-x-2 mb-2">
-                    <MessageSquare className="w-3 h-3 text-accent-400" />
+                    <MessageSquare className="w-3 h-3 text-accent-400 flex-shrink-0" />
                     <span className="text-xs text-accent-400">QueryAmie</span>
                     {isTyping && (
                       <motion.div
-                        className="w-1.5 h-1.5 bg-accent-400 rounded-full"
+                        className="w-1.5 h-1.5 bg-accent-400 rounded-full flex-shrink-0"
                         animate={{ opacity: [1, 0] }}
                         transition={{ duration: 0.8, repeat: Infinity }}
                       />
                     )}
                   </div>
-                  <p className="text-sm leading-relaxed">
-                    {displayText || " "}
-                    {isTyping && (
-                      <motion.span
-                        className="inline-block w-0.5 h-4 bg-accent-400 ml-0.5"
-                        animate={{ opacity: [1, 0] }}
-                        transition={{ duration: 0.8, repeat: Infinity }}
-                      />
-                    )}
-                  </p>
+                  <div className="text-sm leading-[1.4] overflow-hidden">
+                    <p className="whitespace-pre-wrap break-words m-0 p-0">
+                      {displayText || " "}
+                      {isTyping && (
+                        <motion.span
+                          className="inline-block w-0.5 h-[14px] bg-accent-400 ml-0.5 align-middle"
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ duration: 0.8, repeat: Infinity }}
+                        />
+                      )}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             )}
